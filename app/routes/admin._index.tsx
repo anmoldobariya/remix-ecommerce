@@ -1,4 +1,4 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node';
+import { json, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node';
 import { useLoaderData, Link } from '@remix-run/react';
 import { getDb } from '~/utils/db.server';
 import { requireAdmin } from '~/utils/auth.server';
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useLoadingState } from '~/hooks/useLoadingState';
 import { LoadingStats, LoadingSpinner } from '~/components/ui/loading';
+import { generateSEOMeta, SITE_CONFIG } from '~/utils/seo';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAdmin(request);
@@ -52,6 +53,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
   });
 }
+
+export const meta: MetaFunction = () => {
+  return generateSEOMeta({
+    title: `Admin Dashboard | ${SITE_CONFIG.name}`,
+    description: "Administrative dashboard for managing products, users, and content.",
+    noIndex: true // Admin pages should not be indexed by search engines
+  });
+};
 
 export default function AdminDashboard() {
   const { stats } = useLoaderData<typeof loader>();
