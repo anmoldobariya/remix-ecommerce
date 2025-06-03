@@ -55,10 +55,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function AdminDashboard() {
   const { stats } = useLoaderData<typeof loader>();
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
 
-  // Show loading state
-  if (isLoading) {
+  // Show loading state only for initial load, not navigation
+  if (isLoading && !isNavigating) {
     return (
       <div>
         <div className="mb-8">

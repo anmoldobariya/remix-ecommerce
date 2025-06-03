@@ -51,9 +51,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function UsersIndex() {
   const { users } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
 
-  if (isLoading) {
+  if (isLoading && !isNavigating) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">

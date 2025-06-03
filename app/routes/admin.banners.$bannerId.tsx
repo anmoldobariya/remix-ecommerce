@@ -119,10 +119,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function BannerForm() {
   const { banner, isEdit } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
   const isSubmitting = navigation.state === 'submitting';
 
-  if (isLoading) {
+  if (isLoading && !isNavigating) {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
         <div>

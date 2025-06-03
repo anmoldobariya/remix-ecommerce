@@ -92,7 +92,7 @@ export default function Index() {
   const { user, banners, featuredProducts, menProducts, womenProducts, childrenProducts } = useLoaderData<typeof loader>();
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating, destinationPath } = useLoadingState();
 
   // Auto-rotate banners
   useEffect(() => {
@@ -104,8 +104,8 @@ export default function Index() {
     }
   }, [banners.length]);
 
-  // Show loading state
-  if (isLoading) {
+  // Show loading state only for initial load, not navigation
+  if (isLoading && !isNavigating) {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Loading Header */}

@@ -113,9 +113,9 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function CategoriesIndex() {
   const { categories } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
 
-  if (isLoading) {
+  if (isLoading && !isNavigating) {
     return (
       <div className="space-y-8">
         <div className="flex justify-between items-center">
