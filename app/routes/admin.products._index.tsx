@@ -99,10 +99,10 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function AdminProducts() {
   const { products, pagination, filters } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
 
-  // Show loading state
-  if (isLoading) {
+  // Show loading state only for initial load, not navigation
+  if (isLoading && !isNavigating) {
     return (
       <div>
         <div className="flex justify-between items-center mb-8">

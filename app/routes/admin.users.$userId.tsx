@@ -145,10 +145,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function UserForm() {
   const { user, isEdit } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
   const isSubmitting = navigation.state === 'submitting';
 
-  if (isLoading) {
+  if (isLoading && !isNavigating) {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>

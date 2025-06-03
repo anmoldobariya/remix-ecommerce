@@ -54,7 +54,7 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Register() {
   const actionData = useActionData<ActionData>();
   const navigation = useNavigation();
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -64,7 +64,7 @@ export default function Register() {
 
   const isSubmitting = navigation.state === 'submitting';
 
-  if (isLoading) {
+  if (isLoading && !isNavigating) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">

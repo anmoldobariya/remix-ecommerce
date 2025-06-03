@@ -60,14 +60,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function ProductDetail() {
   const { product, relatedProducts } = useLoaderData<typeof loader>();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
 
   const formatCategoryName = (name: string) => {
     return name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
-  // Show loading state
-  if (isLoading) {
+  // Show loading state only for initial load, not navigation
+  if (isLoading && !isNavigating) {
     return <LoadingProductDetail />;
   }
 

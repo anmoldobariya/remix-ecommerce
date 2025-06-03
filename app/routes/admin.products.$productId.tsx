@@ -91,7 +91,7 @@ export default function ProductForm() {
   const { product } = useLoaderData<LoaderData>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
 
   const [images, setImages] = useState<string[]>(
     product?.images?.length ? product.images : []
@@ -110,8 +110,8 @@ export default function ProductForm() {
     }
   };
 
-  // Show loading state
-  if (isLoading) {
+  // Show loading state only for initial load, not navigation
+  if (isLoading && !isNavigating) {
     return (
       <div>
         <div className="flex items-center justify-between mb-8">
