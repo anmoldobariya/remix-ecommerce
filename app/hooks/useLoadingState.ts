@@ -1,9 +1,11 @@
-import { useNavigation } from '@remix-run/react';
+import { useNavigation, useLocation } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 
 export function useLoadingState() {
   const navigation = useNavigation();
+  const location = useLocation();
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const isLoading = navigation.state === 'loading';
   const isSubmitting = navigation.state === 'submitting';
@@ -18,10 +20,24 @@ export function useLoadingState() {
     }
   }, [navigation.state, isInitialLoad]);
 
+  // Handle navigation between different routes
+  useEffect(() => {
+    if (navigation.state === 'loading' && navigation.location) {
+      // Check if we're navigating to a different route
+      const isRouteDifferent =
+        navigation.location.pathname !== location.pathname;
+      setIsNavigating(isRouteDifferent);
+    } else if (navigation.state === 'idle') {
+      setIsNavigating(false);
+    }
+  }, [navigation.state, navigation.location, location.pathname]);
+
   return {
     isLoading: isLoading || isInitialLoad,
     isSubmitting,
-    isIdle: navigation.state === 'idle' && !isInitialLoad
+    isIdle: navigation.state === 'idle' && !isInitialLoad,
+    isNavigating,
+    destinationPath: navigation.location?.pathname
   };
 }
 

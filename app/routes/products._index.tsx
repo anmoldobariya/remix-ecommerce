@@ -80,7 +80,7 @@ export default function ProductsIndex() {
   const { products, pagination, filters } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const { isLoading } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
 
   const updateFilter = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
@@ -101,8 +101,8 @@ export default function ProductsIndex() {
     }).format(price);
   };
 
-  // Show loading state
-  if (isLoading) {
+  // Show loading state only for initial load, not navigation
+  if (isLoading && !isNavigating) {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Promotional Banner */}
