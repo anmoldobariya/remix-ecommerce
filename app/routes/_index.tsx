@@ -12,19 +12,36 @@ import { PromotionalBanner } from "~/components/ui/promotional-banner";
 import { Footer } from "~/components/ui/footer";
 import { useLoadingState } from "~/hooks/useLoadingState";
 import { LoadingBanner, LoadingProductGrid, LoadingSpinner } from "~/components/ui/loading";
+import {
+  generateSEOMeta,
+  generateLocalBusinessStructuredData,
+  generateBreadcrumbStructuredData,
+  generateFAQStructuredData,
+  SITE_CONFIG,
+  SEO_KEYWORDS
+} from "~/utils/seo";
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "Optical Shop - Premium Eyewear Collection | Best Prices with Personal Service" },
-    { name: "description", content: "Discover our premium collection of sunglasses, computer glasses, and prescription eyewear. Get personalized quotes, expert consultations, and unbeatable prices. Contact us for instant pricing!" },
-    { name: "keywords", content: "eyewear, sunglasses, prescription glasses, computer glasses, optical shop, frames, lenses, personalized quotes, expert consultation, best prices" },
-    { name: "author", content: "Optical Shop" },
-    { property: "og:title", content: "Optical Shop - Premium Eyewear with Personal Service" },
-    { property: "og:description", content: "Premium eyewear for every lifestyle. Get personalized quotes and expert advice." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "robots", content: "index, follow" },
-  ];
+  const localBusinessData = generateLocalBusinessStructuredData();
+  const breadcrumbData = generateBreadcrumbStructuredData([
+    { name: "Home", url: "/" }
+  ]);
+  const faqData = generateFAQStructuredData();
+
+  // Combine structured data
+  const combinedStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [localBusinessData, breadcrumbData, faqData]
+  };
+
+  return generateSEOMeta({
+    title: `${SITE_CONFIG.name} - Premium Eyewear Collection | Best Prices with Personal Service`,
+    description: "Discover our premium collection of sunglasses, computer glasses, and prescription eyewear. Get personalized quotes, expert consultations, and unbeatable prices. Contact us for instant pricing!",
+    keywords: [...SEO_KEYWORDS.primary, ...SEO_KEYWORDS.secondary, ...SEO_KEYWORDS.local, ...SEO_KEYWORDS.features],
+    canonical: "/",
+    type: "website",
+    structuredData: combinedStructuredData
+  });
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {

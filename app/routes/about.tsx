@@ -4,13 +4,27 @@ import { Button } from "~/components/ui/button";
 import { ContactInfo } from "~/components/ui/contact-info";
 import { CheckIcon, StarIcon, ShieldIcon, TruckIcon, UsersIcon, AwardIcon } from "lucide-react";
 import { Footer } from "~/components/ui/footer";
+import {
+  generateSEOMeta,
+  generateBreadcrumbStructuredData,
+  SITE_CONFIG,
+  SEO_KEYWORDS
+} from "~/utils/seo";
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "About Us - Optical Shop | Expert Eyewear Specialists" },
-    { name: "description", content: "Learn about our optical shop's commitment to providing premium eyewear, expert eye care, and exceptional customer service since 1995." },
-    { name: "keywords", content: "about optical shop, eye care specialists, premium eyewear, optical services, expert eye exams" },
-  ];
+  const breadcrumbData = generateBreadcrumbStructuredData([
+    { name: "Home", url: "/" },
+    { name: "About Us", url: "/about" }
+  ]);
+
+  return generateSEOMeta({
+    title: `About Us - Expert Eyewear Specialists | ${SITE_CONFIG.name}`,
+    description: "Learn about our optical shop's commitment to providing premium eyewear, expert eye care, and exceptional customer service. Discover our story, values, and dedication to your vision.",
+    keywords: ["about optical shop", "eye care specialists", "premium eyewear", "optical services", "expert eye exams", ...SEO_KEYWORDS.features],
+    canonical: "/about",
+    type: "website",
+    structuredData: breadcrumbData
+  });
 };
 
 export default function About() {

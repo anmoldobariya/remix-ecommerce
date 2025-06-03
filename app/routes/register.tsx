@@ -1,4 +1,4 @@
-import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node';
+import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node';
 import { Form, Link, useActionData, useNavigation } from '@remix-run/react';
 import { useState } from 'react';
 import { Button } from '~/components/ui/button';
@@ -9,6 +9,15 @@ import { createUser, createUserSession, getUserId } from '~/utils/auth.server';
 import { getDb } from '~/utils/db.server';
 import { LoadingForm } from '~/components/ui/loading';
 import { useLoadingState } from '~/hooks/useLoadingState';
+import { generateSEOMeta, SITE_CONFIG } from '~/utils/seo';
+
+export const meta: MetaFunction = () => {
+  return generateSEOMeta({
+    title: `Register | ${SITE_CONFIG.name}`,
+    description: "Create your account to get personalized eyewear quotes, track orders, and access exclusive offers.",
+    noIndex: true // Auth pages typically shouldn't be indexed
+  });
+};
 
 type ActionData = {
   errors?: {
