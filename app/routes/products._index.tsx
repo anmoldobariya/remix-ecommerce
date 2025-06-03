@@ -1,8 +1,14 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node';
+import { json, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node';
 import { Link, useLoaderData, useSearchParams } from '@remix-run/react';
 import { getDb } from '~/utils/db.server';
 import type { Product } from '~/models';
 import { Button } from '~/components/ui/button';
+import {
+  generateSEOMeta,
+  generateBreadcrumbStructuredData,
+  SITE_CONFIG,
+  SEO_KEYWORDS
+} from '~/utils/seo';
 import { Select } from '~/components/ui/select';
 import { FilterIcon, SearchIcon, MenuIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -75,6 +81,51 @@ export async function loader({ request }: LoaderFunctionArgs) {
     },
   });
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
+  const searchParams = new URLSearchParams(location.search);
+  const search = searchParams.get('search') || '';
+  const gender = searchParams.get('gender') || '';
+  const type = searchParams.get('type') || '';
+
+  // Generate dynamic title based on filters
+  let title = 'Premium Eyewear Collection';
+  if (gender) title = `${gender.charAt(0).toUpperCase() + gender.slice(1)} ${title}`;
+  if (type) title = `${type.charAt(0).toUpperCase() + type.slice(1)} - ${title}`;
+  if (search) title = `"${search}" - ${title}`;
+  title += ` | ${SITE_CONFIG.name}`;
+
+  // Generate dynamic description
+  let description = 'Browse our premium collection of eyewear including sunglasses, prescription glasses, and computer glasses.';
+  if (search) description = `Search results for "${search}". ${description}`;
+  if (gender) description = `${gender.charAt(0).toUpperCase() + gender.slice(1)} eyewear collection. ${description}`;
+  if (type) description = `${type.charAt(0).toUpperCase() + type.slice(1)} collection. ${description}`;
+  description += ' Get personalized quotes and expert consultations.';
+
+  // Generate keywords based on filters
+  const keywords = [...SEO_KEYWORDS.primary];
+  if (gender) keywords.push(`${gender} eyewear`, `${gender} glasses`);
+  if (type) keywords.push(type.toLowerCase());
+  if (search) keywords.push(search.toLowerCase());
+  keywords.push(...SEO_KEYWORDS.secondary, ...SEO_KEYWORDS.features);
+
+  // Generate breadcrumb data
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    { name: "Products", url: "/products" }
+  ];
+
+  const breadcrumbData = generateBreadcrumbStructuredData(breadcrumbs);
+
+  return generateSEOMeta({
+    title,
+    description,
+    keywords,
+    canonical: `/products${location.search}`,
+    type: "website",
+    structuredData: breadcrumbData
+  });
+};
 
 export default function ProductsIndex() {
   const { products, pagination, filters } = useLoaderData<typeof loader>();
