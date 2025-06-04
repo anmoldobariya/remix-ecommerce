@@ -1,4 +1,4 @@
-import { json, type LoaderFunctionArgs, type ActionFunctionArgs } from '@remix-run/node';
+import { json, type LoaderFunctionArgs, type ActionFunctionArgs, type MetaFunction } from '@remix-run/node';
 import { useLoaderData, Link, Form, useSearchParams } from '@remix-run/react';
 import { getDb } from '~/utils/db.server';
 import { requireAdmin } from '~/utils/auth.server';
@@ -8,6 +8,15 @@ import { Select } from '~/components/ui/select';
 import { ObjectId } from 'mongodb';
 import { useLoadingState } from '~/hooks/useLoadingState';
 import { LoadingTable, LoadingFilters, LoadingSpinner } from '~/components/ui/loading';
+import { generateSEOMeta, SITE_CONFIG } from '~/utils/seo';
+
+export const meta: MetaFunction = () => {
+  return generateSEOMeta({
+    title: `Admin - Products Management | ${SITE_CONFIG.name}`,
+    description: "Administrative interface for managing product catalog.",
+    noIndex: true
+  });
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAdmin(request);

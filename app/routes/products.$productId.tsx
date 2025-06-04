@@ -1,4 +1,4 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node';
+import { json, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node';
 import { Link, useLoaderData } from '@remix-run/react';
 import { getDb } from '~/utils/db.server';
 import type { Product } from '~/models';
@@ -12,6 +12,14 @@ import { Footer } from '~/components/ui/footer';
 import { useLoadingState } from '~/hooks/useLoadingState';
 import { LoadingProductDetail, LoadingCard } from '~/components/ui/loading';
 import { OptimizedImage } from '~/components/ui/optimized-image';
+import {
+  generateSEOMeta,
+  generateProductStructuredData,
+  generateBreadcrumbStructuredData,
+  generateProductDescription,
+  generateProductKeywords,
+  SITE_CONFIG
+} from '~/utils/seo';
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { productId } = params;
@@ -56,6 +64,52 @@ export async function loader({ params }: LoaderFunctionArgs) {
     })),
   });
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data?.product) {
+    return generateSEOMeta({
+      title: `Product Not Found | ${SITE_CONFIG.name}`,
+      description: "The product you're looking for was not found. Browse our complete eyewear collection.",
+      noIndex: true
+    });
+  }
+
+  const { product } = data;
+  const productTitle = `${product.name} | ${SITE_CONFIG.name}`;
+  const productDescription = generateProductDescription(product);
+  const productKeywords = generateProductKeywords(product);
+
+  // Generate breadcrumb data
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    { name: "Products", url: "/products" },
+    { name: product.name, url: `/products/${product._id}` }
+  ];
+
+  const breadcrumbData = generateBreadcrumbStructuredData(breadcrumbs);
+  const productData = generateProductStructuredData(product);
+
+  // Combine structured data
+  const combinedStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [productData, breadcrumbData]
+  };
+
+  // Generate product image URL for Open Graph
+  const productImage = product.images?.[0]
+    ? `${SITE_CONFIG.url}${product.images[0]}`
+    : `${SITE_CONFIG.url}${SITE_CONFIG.logo}`;
+
+  return generateSEOMeta({
+    title: productTitle,
+    description: productDescription,
+    keywords: productKeywords,
+    canonical: `/products/${product._id}`,
+    type: "product",
+    image: productImage,
+    structuredData: combinedStructuredData
+  });
+};
 
 export default function ProductDetail() {
   const { product, relatedProducts } = useLoaderData<typeof loader>();
