@@ -10,6 +10,7 @@ import { getDb } from '~/utils/db.server';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Select } from '~/components/ui/select';
+import { FormSelect } from '~/components/ui/form-select';
 import { Label } from '~/components/ui/label';
 import { PlusIcon, EditIcon, TrashIcon } from 'lucide-react';
 import { LoadingTable, LoadingForm } from '~/components/ui/loading';
@@ -155,15 +156,15 @@ export default function CategoriesIndex() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="type">Category Type *</Label>
-              <Select
-                id="type"
+              <FormSelect
                 name="type"
-                required
-              >
-                <option value="">Select Type</option>
-                <option value="gender">Gender Category</option>
-                <option value="product">Product Type</option>
-              </Select>
+                options={[
+                  { value: "", label: "Select Type" },
+                  { value: "gender", label: "Gender Category" },
+                  { value: "product", label: "Product Type" }
+                ]}
+                placeholder="Select Type"
+              />
             </div>
             <div>
               <Label htmlFor="name">Internal Name *</Label>
