@@ -10,6 +10,7 @@ import {
   SEO_KEYWORDS
 } from '~/utils/seo';
 import { Select } from '~/components/ui/select';
+import { CustomSelect } from '~/components/ui/custom-select';
 import { FilterIcon, SearchIcon, MenuIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import { SimpleWhatsAppButton } from '~/components/ui/whatsapp-contact';
@@ -288,15 +289,17 @@ export default function ProductsIndex() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Gender
                 </label>
-                <Select
+                <CustomSelect
+                  options={[
+                    { value: "", label: "All Genders" },
+                    { value: "men", label: "Men" },
+                    { value: "women", label: "Women" },
+                    { value: "children", label: "Children" }
+                  ]}
                   value={filters.gender}
-                  onChange={(e) => updateFilter('gender', e.target.value)}
-                >
-                  <option value="">All Genders</option>
-                  <option value="men">Men</option>
-                  <option value="women">Women</option>
-                  <option value="children">Children</option>
-                </Select>
+                  onChange={(value) => updateFilter('gender', value)}
+                  placeholder="Select gender"
+                />
               </div>
 
               {/* Type Filter */}
@@ -304,16 +307,18 @@ export default function ProductsIndex() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Type
                 </label>
-                <Select
+                <CustomSelect
+                  options={[
+                    { value: "", label: "All Types" },
+                    { value: "sunglasses", label: "Sunglasses" },
+                    { value: "computer-glasses", label: "Computer Glasses" },
+                    { value: "reading-glasses", label: "Reading Glasses" },
+                    { value: "prescription-glasses", label: "Prescription Glasses" }
+                  ]}
                   value={filters.type}
-                  onChange={(e) => updateFilter('type', e.target.value)}
-                >
-                  <option value="">All Types</option>
-                  <option value="sunglasses">Sunglasses</option>
-                  <option value="computer-glasses">Computer Glasses</option>
-                  <option value="reading-glasses">Reading Glasses</option>
-                  <option value="prescription-glasses">Prescription Glasses</option>
-                </Select>
+                  onChange={(value) => updateFilter('type', value)}
+                  placeholder="Select type"
+                />
               </div>
 
               {/* Clear Filters */}

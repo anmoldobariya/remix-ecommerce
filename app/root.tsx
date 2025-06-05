@@ -8,6 +8,7 @@ import {
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import { NavigationLoadingOverlay } from "~/components/ui/navigation-loading";
 import { GoogleAnalytics } from "~/components/analytics";
+import { ConfirmationDialogProvider } from "~/components/ui/confirmation-dialog";
 
 import "./tailwind.css";
 
@@ -84,9 +85,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <>
+    <ConfirmationDialogProvider>
       <NavigationLoadingOverlay />
       <Outlet />
-    </>
+    </ConfirmationDialogProvider>
   );
 }
