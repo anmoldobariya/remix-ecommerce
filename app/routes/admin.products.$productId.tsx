@@ -9,6 +9,7 @@ import { Label } from '~/components/ui/label';
 import { Textarea } from '~/components/ui/textarea';
 import { ImageUpload } from '~/components/ui/image-upload';
 import { Select } from '~/components/ui/select';
+import { FormSelect } from '~/components/ui/form-select';
 import { ProductSchema, Product } from '~/models';
 import { ObjectId } from 'mongodb';
 import { useLoadingState } from '~/hooks/useLoadingState';
@@ -209,17 +210,17 @@ export default function ProductForm() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="genderCategory">Gender Category *</Label>
-                <Select
-                  id="genderCategory"
+                <FormSelect
                   name="genderCategory"
-                  required
                   defaultValue={product?.genderCategory}
-                >
-                  <option value="">Select Gender Category</option>
-                  <option value="men">Men</option>
-                  <option value="women">Women</option>
-                  <option value="children">Children</option>
-                </Select>
+                  options={[
+                    { value: "", label: "Select Gender Category" },
+                    { value: "men", label: "Men" },
+                    { value: "women", label: "Women" },
+                    { value: "children", label: "Children" }
+                  ]}
+                  placeholder="Select Gender Category"
+                />
                 {actionData?.errors?.genderCategory && (
                   <p className="text-sm text-destructive mt-1">{actionData.errors.genderCategory[0]}</p>
                 )}
@@ -227,18 +228,18 @@ export default function ProductForm() {
 
               <div>
                 <Label htmlFor="productType">Product Type *</Label>
-                <Select
-                  id="productType"
+                <FormSelect
                   name="productType"
-                  required
                   defaultValue={product?.productType}
-                >
-                  <option value="">Select Product Type</option>
-                  <option value="sunglasses">Sunglasses</option>
-                  <option value="computer-glasses">Computer Glasses</option>
-                  <option value="reading-glasses">Reading Glasses</option>
-                  <option value="prescription-glasses">Prescription Glasses</option>
-                </Select>
+                  options={[
+                    { value: "", label: "Select Product Type" },
+                    { value: "sunglasses", label: "Sunglasses" },
+                    { value: "computer-glasses", label: "Computer Glasses" },
+                    { value: "reading-glasses", label: "Reading Glasses" },
+                    { value: "prescription-glasses", label: "Prescription Glasses" }
+                  ]}
+                  placeholder="Select Product Type"
+                />
                 {actionData?.errors?.productType && (
                   <p className="text-sm text-destructive mt-1">{actionData.errors.productType[0]}</p>
                 )}

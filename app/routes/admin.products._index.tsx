@@ -5,6 +5,8 @@ import { requireAdmin } from '~/utils/auth.server';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Select } from '~/components/ui/select';
+import { CustomSelect } from '~/components/ui/custom-select';
+import { FormSelect } from '~/components/ui/form-select';
 import { ObjectId } from 'mongodb';
 import { useLoadingState } from '~/hooks/useLoadingState';
 import { LoadingTable, LoadingFilters, LoadingSpinner } from '~/components/ui/loading';
@@ -156,25 +158,29 @@ export default function AdminProducts() {
               defaultValue={filters.search}
             />
           </div>
-          <Select
+          <FormSelect
             name="category"
             defaultValue={filters.category}
-          >
-            <option value="">All Categories</option>
-            <option value="men">Men</option>
-            <option value="women">Women</option>
-            <option value="children">Children</option>
-          </Select>
-          <Select
+            options={[
+              { value: "", label: "All Categories" },
+              { value: "men", label: "Men" },
+              { value: "women", label: "Women" },
+              { value: "children", label: "Children" }
+            ]}
+            placeholder="Select category"
+          />
+          <FormSelect
             name="type"
             defaultValue={filters.type}
-          >
-            <option value="">All Types</option>
-            <option value="sunglasses">Sunglasses</option>
-            <option value="computer-glasses">Computer Glasses</option>
-            <option value="reading-glasses">Reading Glasses</option>
-            <option value="prescription-glasses">Prescription Glasses</option>
-          </Select>
+            options={[
+              { value: "", label: "All Types" },
+              { value: "sunglasses", label: "Sunglasses" },
+              { value: "computer-glasses", label: "Computer Glasses" },
+              { value: "reading-glasses", label: "Reading Glasses" },
+              { value: "prescription-glasses", label: "Prescription Glasses" }
+            ]}
+            placeholder="Select type"
+          />
           <Button type="submit" variant="outline">
             Filter
           </Button>
