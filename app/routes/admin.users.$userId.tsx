@@ -10,6 +10,7 @@ import { getDb } from '~/utils/db.server';
 import { UserSchema, type User } from '~/models';
 import { Button } from '~/components/ui/button';
 import { Select } from '~/components/ui/select';
+import { FormSelect } from '~/components/ui/form-select';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { ObjectId } from 'mongodb';
@@ -199,15 +200,15 @@ export default function UserForm() {
 
             <div>
               <Label htmlFor="role">Role *</Label>
-              <Select
-                id="role"
+              <FormSelect
                 name="role"
-                required
                 defaultValue={user?.role || 'user'}
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </Select>
+                options={[
+                  { value: "user", label: "User" },
+                  { value: "admin", label: "Admin" }
+                ]}
+                placeholder="Select role"
+              />
             </div>
 
             <div>
