@@ -18,7 +18,7 @@ export default function AdminLayout() {
     { name: 'Categories', href: '/admin/categories' },
     { name: 'Banners', href: '/admin/banners' },
     { name: 'Users', href: '/admin/users' },
-    { name: 'Seed Data', href: '/admin/seed' },
+    // { name: 'Seed Data', href: '/admin/seed' },
   ];
 
   const isActive = (href: string, exact = false) => {

@@ -8,6 +8,7 @@ import type { Banner } from '~/models';
 import { ObjectId } from 'mongodb';
 import { LoadingTable } from '~/components/ui/loading';
 import { useLoadingState } from '~/hooks/useLoadingState';
+import { useConfirmation } from '~/components/ui/confirmation-dialog';
 
 export async function action({ request }: ActionFunctionArgs) {
   await requireAdmin(request);
@@ -51,6 +52,7 @@ export default function BannersIndex() {
   const { banners } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const { isLoading, isNavigating } = useLoadingState();
+  const { confirm } = useConfirmation();
 
   if (isLoading && !isNavigating) {
     return (
@@ -176,9 +178,19 @@ export default function BannersIndex() {
                             type="submit"
                             variant="outline"
                             size="sm"
-                            onClick={(e) => {
-                              if (!confirm('Are you sure you want to delete this banner?')) {
-                                e.preventDefault();
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              const confirmed = await confirm({
+                                title: 'Delete Banner',
+                                message: `Are you sure you want to delete the banner "${banner.title}"? This action cannot be undone.`,
+                                confirmText: 'Delete Banner',
+                                cancelText: 'Cancel',
+                                variant: 'danger'
+                              });
+
+                              if (confirmed) {
+                                const form = e.currentTarget.closest('form');
+                                if (form) form.submit();
                               }
                             }}
                           >
