@@ -14,6 +14,7 @@ import { Label } from '~/components/ui/label';
 import { PlusIcon, EditIcon, TrashIcon } from 'lucide-react';
 import { LoadingTable, LoadingForm } from '~/components/ui/loading';
 import { useLoadingState } from '~/hooks/useLoadingState';
+import { useConfirmation } from '~/components/ui/confirmation-dialog';
 
 type Category = {
   _id: string;
@@ -114,6 +115,7 @@ export default function CategoriesIndex() {
   const { categories } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const { isLoading, isNavigating } = useLoadingState();
+  const { confirm } = useConfirmation();
 
   if (isLoading && !isNavigating) {
     return (
@@ -253,9 +255,19 @@ export default function CategoriesIndex() {
                           value="delete"
                           size="sm"
                           variant="outline"
-                          onClick={(e) => {
-                            if (!confirm('Are you sure you want to delete this category?')) {
-                              e.preventDefault();
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            const confirmed = await confirm({
+                              title: 'Delete Category',
+                              message: `Are you sure you want to delete the category "${category.displayName}"? This action cannot be undone.`,
+                              confirmText: 'Delete',
+                              cancelText: 'Cancel',
+                              variant: 'danger'
+                            });
+
+                            if (confirmed) {
+                              const form = e.currentTarget.closest('form');
+                              if (form) form.submit();
                             }
                           }}
                         >
@@ -340,9 +352,19 @@ export default function CategoriesIndex() {
                           value="delete"
                           size="sm"
                           variant="outline"
-                          onClick={(e) => {
-                            if (!confirm('Are you sure you want to delete this category?')) {
-                              e.preventDefault();
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            const confirmed = await confirm({
+                              title: 'Delete Category',
+                              message: `Are you sure you want to delete the category "${category.displayName}"? This action cannot be undone.`,
+                              confirmText: 'Delete',
+                              cancelText: 'Cancel',
+                              variant: 'danger'
+                            });
+
+                            if (confirmed) {
+                              const form = e.currentTarget.closest('form');
+                              if (form) form.submit();
                             }
                           }}
                         >
