@@ -1,4 +1,4 @@
-import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node';
+import { json, type LoaderFunctionArgs } from '@remix-run/node';
 import { Link, Outlet, useLoaderData, useLocation } from '@remix-run/react';
 import { requireAdmin } from '~/utils/auth.server';
 import { Button } from '~/components/ui/button';
@@ -29,7 +29,7 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="h-svh bg-gray-50 overflow-hidden">
+    <div className="flex flex-col h-screen">
       {/* Top navigation */}
       <nav className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -56,34 +56,30 @@ export default function AdminLayout() {
         </div>
       </nav>
 
-      <div className="flex h-full">
+      <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <div className="w-64 bg-white shadow-sm h-full">
-          <nav className="mt-8">
-            <div className="px-4">
-              <ul className="space-y-2">
-                {navigation.map((item) => (
-                  <li key={item.name}>
-                    <Link
-                      to={item.href}
-                      className={`block px-4 py-2 text-sm font-medium rounded-md transition-colors ${isActive(item.href, item.exact)
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-gray-700 hover:bg-gray-100'
-                        }`}
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </nav>
-        </div>
+        <nav className='w-64 bg-white shadow-sm h-full p-4 border-r'>
+          <ul className="space-y-2">
+            {navigation.map((item) => (
+              <li key={item.name}>
+                <Link
+                  to={item.href}
+                  className={`block px-4 py-2 text-sm font-medium rounded-md transition-colors ${isActive(item.href, item.exact)
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                >
+                  {item.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         {/* Main content */}
-        <div className="flex-1 h-full p-8 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
           <Outlet />
-        </div>
+        </main>
       </div>
     </div>
   );
