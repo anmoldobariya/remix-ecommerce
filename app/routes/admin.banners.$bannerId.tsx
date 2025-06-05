@@ -15,6 +15,7 @@ import { Textarea } from '~/components/ui/textarea';
 import { ObjectId } from 'mongodb';
 import { LoadingForm } from '~/components/ui/loading';
 import { useLoadingState } from '~/hooks/useLoadingState';
+import { useConfirmation } from '~/components/ui/confirmation-dialog';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   await requireAdmin(request);
@@ -121,6 +122,7 @@ export default function BannerForm() {
   const navigation = useNavigation();
   const { isLoading, isNavigating } = useLoadingState();
   const isSubmitting = navigation.state === 'submitting';
+  const { confirm } = useConfirmation();
 
   if (isLoading && !isNavigating) {
     return (
@@ -269,9 +271,26 @@ export default function BannerForm() {
                   value="delete"
                   variant="outline"
                   disabled={isSubmitting}
-                  onClick={(e) => {
-                    if (!confirm('Are you sure you want to delete this banner?')) {
-                      e.preventDefault();
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    const confirmed = await confirm({
+                      title: 'Delete Banner',
+                      message: `Are you sure you want to delete the banner "${banner?.title}"? This action cannot be undone.`,
+                      confirmText: 'Delete Banner',
+                      cancelText: 'Cancel',
+                      variant: 'danger'
+                    });
+
+                    if (confirmed) {
+                      const form = e.currentTarget.closest('form');
+                      if (form) {
+                        const deleteInput = document.createElement('input');
+                        deleteInput.type = 'hidden';
+                        deleteInput.name = '_action';
+                        deleteInput.value = 'delete';
+                        form.appendChild(deleteInput);
+                        form.submit();
+                      }
                     }
                   }}
                 >

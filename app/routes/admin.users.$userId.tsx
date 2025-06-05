@@ -10,12 +10,14 @@ import { getDb } from '~/utils/db.server';
 import { UserSchema, type User } from '~/models';
 import { Button } from '~/components/ui/button';
 import { Select } from '~/components/ui/select';
+import { FormSelect } from '~/components/ui/form-select';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcryptjs';
 import { LoadingForm } from '~/components/ui/loading';
 import { useLoadingState } from '~/hooks/useLoadingState';
+import { useConfirmation } from '~/components/ui/confirmation-dialog';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   await requireAdmin(request);
@@ -146,6 +148,7 @@ export default function UserForm() {
   const { user, isEdit } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const { isLoading, isNavigating } = useLoadingState();
+  const { confirm } = useConfirmation();
   const isSubmitting = navigation.state === 'submitting';
 
   if (isLoading && !isNavigating) {
@@ -197,15 +200,15 @@ export default function UserForm() {
 
             <div>
               <Label htmlFor="role">Role *</Label>
-              <Select
-                id="role"
+              <FormSelect
                 name="role"
-                required
                 defaultValue={user?.role || 'user'}
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </Select>
+                options={[
+                  { value: "user", label: "User" },
+                  { value: "admin", label: "Admin" }
+                ]}
+                placeholder="Select role"
+              />
             </div>
 
             <div>
@@ -246,9 +249,26 @@ export default function UserForm() {
                   value="delete"
                   variant="outline"
                   disabled={isSubmitting}
-                  onClick={(e) => {
-                    if (!confirm('Are you sure you want to delete this user?')) {
-                      e.preventDefault();
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    const confirmed = await confirm({
+                      title: 'Delete User',
+                      message: `Are you sure you want to delete the user "${user?.name}"? This action cannot be undone.`,
+                      confirmText: 'Delete User',
+                      cancelText: 'Cancel',
+                      variant: 'danger'
+                    });
+
+                    if (confirmed) {
+                      const form = e.currentTarget.closest('form');
+                      if (form) {
+                        const deleteInput = document.createElement('input');
+                        deleteInput.type = 'hidden';
+                        deleteInput.name = '_action';
+                        deleteInput.value = 'delete';
+                        form.appendChild(deleteInput);
+                        form.submit();
+                      }
                     }
                   }}
                 >

@@ -10,10 +10,12 @@ import { getDb } from '~/utils/db.server';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Select } from '~/components/ui/select';
+import { FormSelect } from '~/components/ui/form-select';
 import { Label } from '~/components/ui/label';
 import { PlusIcon, EditIcon, TrashIcon } from 'lucide-react';
 import { LoadingTable, LoadingForm } from '~/components/ui/loading';
 import { useLoadingState } from '~/hooks/useLoadingState';
+import { useConfirmation } from '~/components/ui/confirmation-dialog';
 
 type Category = {
   _id: string;
@@ -114,6 +116,7 @@ export default function CategoriesIndex() {
   const { categories } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const { isLoading, isNavigating } = useLoadingState();
+  const { confirm } = useConfirmation();
 
   if (isLoading && !isNavigating) {
     return (
@@ -153,15 +156,15 @@ export default function CategoriesIndex() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="type">Category Type *</Label>
-              <Select
-                id="type"
+              <FormSelect
                 name="type"
-                required
-              >
-                <option value="">Select Type</option>
-                <option value="gender">Gender Category</option>
-                <option value="product">Product Type</option>
-              </Select>
+                options={[
+                  { value: "", label: "Select Type" },
+                  { value: "gender", label: "Gender Category" },
+                  { value: "product", label: "Product Type" }
+                ]}
+                placeholder="Select Type"
+              />
             </div>
             <div>
               <Label htmlFor="name">Internal Name *</Label>
@@ -253,9 +256,19 @@ export default function CategoriesIndex() {
                           value="delete"
                           size="sm"
                           variant="outline"
-                          onClick={(e) => {
-                            if (!confirm('Are you sure you want to delete this category?')) {
-                              e.preventDefault();
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            const confirmed = await confirm({
+                              title: 'Delete Category',
+                              message: `Are you sure you want to delete the category "${category.displayName}"? This action cannot be undone.`,
+                              confirmText: 'Delete',
+                              cancelText: 'Cancel',
+                              variant: 'danger'
+                            });
+
+                            if (confirmed) {
+                              const form = e.currentTarget.closest('form');
+                              if (form) form.submit();
                             }
                           }}
                         >
@@ -340,9 +353,19 @@ export default function CategoriesIndex() {
                           value="delete"
                           size="sm"
                           variant="outline"
-                          onClick={(e) => {
-                            if (!confirm('Are you sure you want to delete this category?')) {
-                              e.preventDefault();
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            const confirmed = await confirm({
+                              title: 'Delete Category',
+                              message: `Are you sure you want to delete the category "${category.displayName}"? This action cannot be undone.`,
+                              confirmText: 'Delete',
+                              cancelText: 'Cancel',
+                              variant: 'danger'
+                            });
+
+                            if (confirmed) {
+                              const form = e.currentTarget.closest('form');
+                              if (form) form.submit();
                             }
                           }}
                         >

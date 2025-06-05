@@ -48,52 +48,55 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getUser(request);
   const db = await getDb();
 
-  // Get active banners
-  const banners = await db.collection('banners')
-    .find({
-      isActive: true,
-      $and: [
-        {
-          $or: [
-            { startDate: { $exists: false } },
-            { startDate: null },
-            { startDate: { $lte: new Date() } }
-          ]
-        },
-        {
-          $or: [
-            { endDate: { $exists: false } },
-            { endDate: null },
-            { endDate: { $gte: new Date() } }
-          ]
-        }
-      ]
-    })
-    .sort({ order: 1 })
-    .limit(5)
-    .toArray();
+  // Execute all database queries concurrently
+  const [banners, featuredProducts, menProducts, womenProducts, childrenProducts] = await Promise.all([
+    // Get active banners
+    db.collection('banners')
+      .find({
+        isActive: true,
+        $and: [
+          {
+            $or: [
+              { startDate: { $exists: false } },
+              { startDate: null },
+              { startDate: { $lte: new Date() } }
+            ]
+          },
+          {
+            $or: [
+              { endDate: { $exists: false } },
+              { endDate: null },
+              { endDate: { $gte: new Date() } }
+            ]
+          }
+        ]
+      })
+      .sort({ order: 1 })
+      .limit(5)
+      .toArray(),
 
-  // Get featured products
-  const featuredProducts = await db.collection('products')
-    .find({ isActive: true, isFeatured: true })
-    .limit(8)
-    .toArray();
+    // Get featured products
+    db.collection('products')
+      .find({ isActive: true, isFeatured: true })
+      .limit(8)
+      .toArray(),
 
-  // Get products by category
-  const menProducts = await db.collection('products')
-    .find({ isActive: true, genderCategory: 'men' })
-    .limit(4)
-    .toArray();
+    // Get products by category
+    db.collection('products')
+      .find({ isActive: true, genderCategory: 'men' })
+      .limit(4)
+      .toArray(),
 
-  const womenProducts = await db.collection('products')
-    .find({ isActive: true, genderCategory: 'women' })
-    .limit(4)
-    .toArray();
+    db.collection('products')
+      .find({ isActive: true, genderCategory: 'women' })
+      .limit(4)
+      .toArray(),
 
-  const childrenProducts = await db.collection('products')
-    .find({ isActive: true, genderCategory: 'children' })
-    .limit(4)
-    .toArray();
+    db.collection('products')
+      .find({ isActive: true, genderCategory: 'children' })
+      .limit(4)
+      .toArray()
+  ]);
 
   return json({
     user,
