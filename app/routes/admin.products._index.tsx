@@ -201,9 +201,6 @@ export default function AdminProducts() {
                   Category
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -245,16 +242,6 @@ export default function AdminProducts() {
                       <div className="text-sm text-gray-500">
                         {product.productType.replace('-', ' ')}
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        ${product.price}
-                      </div>
-                      {product.originalPrice && product.originalPrice > product.price && (
-                        <div className="text-sm text-gray-500 line-through">
-                          ${product.originalPrice}
-                        </div>
-                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col space-y-1">
