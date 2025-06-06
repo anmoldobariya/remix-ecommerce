@@ -17,14 +17,9 @@ export const UserSchema = z.object({
 
 export type User = z.infer<typeof UserSchema>;
 
-// Product Category Schemas
-export const GenderCategorySchema = z.enum(['men', 'women', 'children']);
-export const ProductTypeSchema = z.enum([
-  'sunglasses',
-  'computer-glasses',
-  'reading-glasses',
-  'prescription-glasses'
-]);
+// Product Category Schemas - Now flexible to accept dynamic values
+export const GenderCategorySchema = z.string().min(1);
+export const ProductTypeSchema = z.string().min(1);
 
 export type GenderCategory = z.infer<typeof GenderCategorySchema>;
 export type ProductType = z.infer<typeof ProductTypeSchema>;

@@ -17,7 +17,7 @@ export interface CustomSelectProps {
 }
 
 const CustomSelect = React.forwardRef<HTMLDivElement, CustomSelectProps>(
-  ({ options, value, onChange, placeholder = "Select an option", className, disabled = false, ...props }, ref) => {
+  ({ options, value, onChange, placeholder = "Select an option", className, disabled = false, ...props }, _ref) => {
     const [isOpen, setIsOpen] = React.useState(false);
     const selectRef = React.useRef<HTMLDivElement>(null);
 

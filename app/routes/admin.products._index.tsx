@@ -1,16 +1,17 @@
 import { json, type LoaderFunctionArgs, type ActionFunctionArgs, type MetaFunction } from '@remix-run/node';
-import { useLoaderData, Link, Form, useSearchParams } from '@remix-run/react';
+import { useLoaderData, Link, Form, useSearchParams, redirect } from '@remix-run/react';
 import { getDb } from '~/utils/db.server';
 import { requireAdmin } from '~/utils/auth.server';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
-import { Select } from '~/components/ui/select';
-import { CustomSelect } from '~/components/ui/custom-select';
 import { FormSelect } from '~/components/ui/form-select';
 import { ObjectId } from 'mongodb';
 import { useLoadingState } from '~/hooks/useLoadingState';
-import { LoadingTable, LoadingFilters, LoadingSpinner } from '~/components/ui/loading';
+import { LoadingTable, LoadingFilters } from '~/components/ui/loading';
 import { generateSEOMeta, SITE_CONFIG } from '~/utils/seo';
+import { getActiveCategories } from '~/utils/categories.server';
+import { useConfirmation } from '~/components/ui/confirmation-dialog';
+import { TrashIcon } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return generateSEOMeta({
@@ -44,7 +45,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (category) filter.genderCategory = category;
   if (type) filter.productType = type;
 
-  const [products, totalCount] = await Promise.all([
+  const [products, totalCount, categories] = await Promise.all([
     db.collection('products')
       .find(filter)
       .sort({ createdAt: -1 })
@@ -52,6 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       .limit(limit)
       .toArray(),
     db.collection('products').countDocuments(filter),
+    getActiveCategories(),
   ]);
 
   const totalPages = Math.ceil(totalCount / limit);
@@ -66,6 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       hasPrevPage: page > 1,
     },
     filters: { search, category, type },
+    categories,
   });
 }
 
@@ -79,7 +82,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (action === 'delete' && productId) {
     await db.collection('products').deleteOne({ _id: new ObjectId(productId) });
-    return json({ success: true });
+    return redirect('/admin/products');
   }
 
   if (action === 'toggle-active' && productId) {
@@ -108,9 +111,10 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function AdminProducts() {
-  const { products, pagination, filters } = useLoaderData<typeof loader>();
+  const { products, pagination, filters, categories } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
   const { isLoading, isNavigating } = useLoadingState();
+  const { confirm } = useConfirmation();
 
   // Show loading state only for initial load, not navigation
   if (isLoading && !isNavigating) {
@@ -163,9 +167,7 @@ export default function AdminProducts() {
             defaultValue={filters.category}
             options={[
               { value: "", label: "All Categories" },
-              { value: "men", label: "Men" },
-              { value: "women", label: "Women" },
-              { value: "children", label: "Children" }
+              ...categories.genderCategories
             ]}
             placeholder="Select category"
           />
@@ -174,10 +176,7 @@ export default function AdminProducts() {
             defaultValue={filters.type}
             options={[
               { value: "", label: "All Types" },
-              { value: "sunglasses", label: "Sunglasses" },
-              { value: "computer-glasses", label: "Computer Glasses" },
-              { value: "reading-glasses", label: "Reading Glasses" },
-              { value: "prescription-glasses", label: "Prescription Glasses" }
+              ...categories.productCategories
             ]}
             placeholder="Select type"
           />
@@ -203,9 +202,6 @@ export default function AdminProducts() {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
@@ -249,16 +245,6 @@ export default function AdminProducts() {
                       <div className="text-sm text-gray-500">
                         {product.productType.replace('-', ' ')}
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        ${product.price}
-                      </div>
-                      {product.originalPrice && product.originalPrice > product.price && (
-                        <div className="text-sm text-gray-500 line-through">
-                          ${product.originalPrice}
-                        </div>
-                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col space-y-1">
@@ -307,6 +293,32 @@ export default function AdminProducts() {
                           {product.isFeatured ? 'Unfeature' : 'Feature'}
                         </Button>
                       </Form>
+                      <form method="post" className="inline">
+                        <input type="hidden" name="bannerId" value={product._id} />
+                        <input type="hidden" name="_action" value="delete" />
+                        <Button
+                          type="submit"
+                          variant="outline"
+                          size="sm"
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            const confirmed = await confirm({
+                              title: 'Delete Product',
+                              message: `Are you sure you want to delete the product "${product.name}"? This action cannot be undone.`,
+                              confirmText: 'Delete Product',
+                              cancelText: 'Cancel',
+                              variant: 'danger'
+                            });
+
+                            if (confirmed) {
+                              const form = e.currentTarget.closest('form');
+                              if (form) form.submit();
+                            }
+                          }}
+                        >
+                          <TrashIcon className="w-4 h-4 text-red-600" />
+                        </Button>
+                      </form>
                     </td>
                   </tr>
                 ))

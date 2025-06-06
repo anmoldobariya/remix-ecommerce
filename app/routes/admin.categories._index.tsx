@@ -4,15 +4,14 @@ import {
   type LoaderFunctionArgs,
   type ActionFunctionArgs,
 } from '@remix-run/node';
-import { useLoaderData, Form, Link, useNavigation } from '@remix-run/react';
+import { useLoaderData, Form } from '@remix-run/react';
 import { requireAdmin } from '~/utils/auth.server';
 import { getDb } from '~/utils/db.server';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
-import { Select } from '~/components/ui/select';
 import { FormSelect } from '~/components/ui/form-select';
 import { Label } from '~/components/ui/label';
-import { PlusIcon, EditIcon, TrashIcon } from 'lucide-react';
+import { PlusIcon, TrashIcon } from 'lucide-react';
 import { LoadingTable, LoadingForm } from '~/components/ui/loading';
 import { useLoadingState } from '~/hooks/useLoadingState';
 import { useConfirmation } from '~/components/ui/confirmation-dialog';
@@ -114,7 +113,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function CategoriesIndex() {
   const { categories } = useLoaderData<typeof loader>();
-  const navigation = useNavigation();
   const { isLoading, isNavigating } = useLoadingState();
   const { confirm } = useConfirmation();
 

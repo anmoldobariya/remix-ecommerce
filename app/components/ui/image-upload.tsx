@@ -1,15 +1,24 @@
 import { useState, useRef, DragEvent } from 'react';
 import { Button } from '~/components/ui/button';
-import { XIcon, UploadIcon, ImageIcon } from 'lucide-react';
+import { XIcon, UploadIcon } from 'lucide-react';
 
 interface ImageUploadProps {
   images: string[];
   onChange: (images: string[]) => void;
   maxImages?: number;
   disabled?: boolean;
+  productId?: string; // Optional product ID for existing products
+  onTempIdChange?: (tempId: string) => void; // Callback for temporary ID
 }
 
-export function ImageUpload({ images, onChange, maxImages = 10, disabled = false }: ImageUploadProps) {
+export function ImageUpload({
+  images,
+  onChange,
+  maxImages = 10,
+  disabled = false,
+  productId,
+  onTempIdChange
+}: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -70,6 +79,11 @@ export function ImageUpload({ images, onChange, maxImages = 10, disabled = false
         formData.append(`file${index}`, file);
       });
 
+      // Add productId if available
+      if (productId) {
+        formData.append('productId', productId);
+      }
+
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
@@ -78,8 +92,14 @@ export function ImageUpload({ images, onChange, maxImages = 10, disabled = false
       if (response.ok) {
         const result = await response.json();
         onChange([...images, ...result.urls]);
+
+        // If a temporary ID was generated and we have a callback, notify parent
+        if (result.isTemporary && result.productId && onTempIdChange) {
+          onTempIdChange(result.productId);
+        }
       } else {
-        throw new Error('Upload failed');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Upload failed');
       }
     } catch (error) {
       console.error('Upload error:', error);
@@ -108,8 +128,8 @@ export function ImageUpload({ images, onChange, maxImages = 10, disabled = false
       {/* Upload Area */}
       <div
         className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${isDragging
-            ? 'border-blue-400 bg-blue-50'
-            : 'border-gray-300 hover:border-gray-400'
+          ? 'border-blue-400 bg-blue-50'
+          : 'border-gray-300 hover:border-gray-400'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}

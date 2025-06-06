@@ -1,5 +1,6 @@
 import { json, type ActionFunctionArgs } from '@remix-run/node';
 import { uploadMultipleFiles, validateMultipleImageFiles } from '~/utils/upload.server';
+import { randomUUID } from 'crypto';
 
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== 'POST') {
@@ -9,6 +10,10 @@ export async function action({ request }: ActionFunctionArgs) {
   try {
     const formData = await request.formData();
     const files: File[] = [];
+
+    // Get productId from form data, if not provided generate a temporary one
+    const productId = formData.get('productId') as string;
+    const finalProductId = productId || `temp-${randomUUID()}`;
 
     // Extract files from FormData
     for (const [key, value] of formData.entries()) {
@@ -28,11 +33,13 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     // Upload files
-    const urls = await uploadMultipleFiles(files, 'products');
+    const urls = await uploadMultipleFiles(files, finalProductId);
 
     return json({
       success: true,
       urls,
+      productId: finalProductId,
+      isTemporary: !productId,
       message: `Successfully uploaded ${files.length} file(s)`
     });
 

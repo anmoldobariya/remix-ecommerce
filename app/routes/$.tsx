@@ -1,7 +1,19 @@
-import { Link } from "@remix-run/react";
+import { json } from "@remix-run/node";
+import { Link, useLoaderData } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
+import { getActiveCategories } from "~/utils/categories.server";
+
+export async function loader() {
+  const { genderCategories, productCategories } = await getActiveCategories();
+
+  return json({
+    genderCategories,
+    productCategories,
+  });
+}
 
 export default function NotFound() {
+  const { genderCategories, productCategories } = useLoaderData<typeof loader>();
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center px-4">
       <div className="text-center max-w-md mx-auto">
@@ -53,18 +65,27 @@ export default function NotFound() {
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-500 mb-4">Quick Links:</p>
           <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <Link to="/products?gender=men" className="text-blue-600 hover:text-blue-800 transition-colors">
-              Men's Eyewear
+            <Link to="/products" className="text-blue-600 hover:text-blue-800 transition-colors">
+              All Products
             </Link>
-            <Link to="/products?gender=women" className="text-blue-600 hover:text-blue-800 transition-colors">
-              Women's Eyewear
-            </Link>
-            <Link to="/products?gender=children" className="text-blue-600 hover:text-blue-800 transition-colors">
-              Kids' Eyewear
-            </Link>
-            <Link to="/products?type=sunglasses" className="text-blue-600 hover:text-blue-800 transition-colors">
-              Sunglasses
-            </Link>
+            {genderCategories.slice(0, 2).map((category) => (
+              <Link
+                key={category.value}
+                to={`/products?gender=${category.value}`}
+                className="text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                {category.label} Eyewear
+              </Link>
+            ))}
+            {productCategories.slice(0, 2).map((category) => (
+              <Link
+                key={category.value}
+                to={`/products?type=${category.value}`}
+                className="text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                {category.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
