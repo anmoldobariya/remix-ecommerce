@@ -2,7 +2,24 @@ import { Link } from '@remix-run/react';
 import { MessageCircleIcon, PhoneIcon, MailIcon, MapPinIcon } from 'lucide-react';
 import { Button } from './button';
 
-export function Footer() {
+interface CategoryOption {
+  value: string;
+  label: string;
+}
+
+interface FooterProps {
+  productCategories?: CategoryOption[];
+}
+
+export function Footer({ productCategories }: FooterProps = {}) {
+  // Default categories for fallback
+  const defaultCategories = [
+    { value: 'sunglasses', label: 'Sunglasses' },
+    { value: 'computer', label: 'Computer Glasses' },
+    { value: 'reading', label: 'Reading Glasses' },
+  ];
+
+  const categoriesToShow = productCategories?.slice(0, 3) || defaultCategories;
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -51,21 +68,16 @@ export function Footer() {
                   All Products
                 </Link>
               </li>
-              <li>
-                <Link to="/products?gender=men" className="text-gray-300 hover:text-white transition-colors text-sm">
-                  Men&apos;s Eyewear
-                </Link>
-              </li>
-              <li>
-                <Link to="/products?gender=women" className="text-gray-300 hover:text-white transition-colors text-sm">
-                  Women&apos;s Eyewear
-                </Link>
-              </li>
-              <li>
-                <Link to="/products?gender=children" className="text-gray-300 hover:text-white transition-colors text-sm">
-                  Children&apos;s Eyewear
-                </Link>
-              </li>
+              {categoriesToShow.map((category) => (
+                <li key={category.value}>
+                  <Link
+                    to={`/products?type=${category.value}`}
+                    className="text-gray-300 hover:text-white transition-colors text-sm"
+                  >
+                    {category.label}
+                  </Link>
+                </li>
+              ))}
               <li>
                 <Link to="/about" className="text-gray-300 hover:text-white transition-colors text-sm">
                   About Us

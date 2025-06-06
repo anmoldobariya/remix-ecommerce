@@ -12,6 +12,7 @@ import { PromotionalBanner } from "~/components/ui/promotional-banner";
 import { Footer } from "~/components/ui/footer";
 import { useLoadingState } from "~/hooks/useLoadingState";
 import { LoadingBanner, LoadingProductGrid, LoadingSpinner } from "~/components/ui/loading";
+import { getActiveCategories } from "~/utils/categories.server";
 import {
   generateSEOMeta,
   generateLocalBusinessStructuredData,
@@ -48,8 +49,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getUser(request);
   const db = await getDb();
 
+  // Get active gender categories for dynamic queries
+  const { genderCategories, productCategories } = await getActiveCategories();
+
   // Execute all database queries concurrently
-  const [banners, featuredProducts, menProducts, womenProducts, childrenProducts] = await Promise.all([
+  const [banners, featuredProducts, ...categoryProducts] = await Promise.all([
     // Get active banners
     db.collection('banners')
       .find({
@@ -81,35 +85,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
       .limit(8)
       .toArray(),
 
-    // Get products by category
-    db.collection('products')
-      .find({ isActive: true, genderCategory: 'men' })
-      .limit(4)
-      .toArray(),
-
-    db.collection('products')
-      .find({ isActive: true, genderCategory: 'women' })
-      .limit(4)
-      .toArray(),
-
-    db.collection('products')
-      .find({ isActive: true, genderCategory: 'children' })
-      .limit(4)
-      .toArray()
+    // Get products by each active gender category dynamically
+    ...genderCategories.map(category =>
+      db.collection('products')
+        .find({ isActive: true, genderCategory: category.value })
+        .limit(4)
+        .toArray()
+    )
   ]);
+
+  // Create dynamic data structure for categories
+  const categoryProductsData: Record<string, any[]> = {};
+  genderCategories.forEach((category, index) => {
+    categoryProductsData[category.value] = categoryProducts[index]?.map((product: any) => ({
+      ...product,
+      _id: product._id.toString()
+    })) || [];
+  });
 
   return json({
     user,
     banners: banners.map((banner: any) => ({ ...banner, _id: banner._id.toString() })),
     featuredProducts: featuredProducts.map((product: any) => ({ ...product, _id: product._id.toString() })),
-    menProducts: menProducts.map((product: any) => ({ ...product, _id: product._id.toString() })),
-    womenProducts: womenProducts.map((product: any) => ({ ...product, _id: product._id.toString() })),
-    childrenProducts: childrenProducts.map((product: any) => ({ ...product, _id: product._id.toString() })),
+    genderCategories,
+    productCategories,
+    categoryProducts: categoryProductsData,
   });
 }
 
 export default function Index() {
-  const { user, banners, featuredProducts, menProducts, womenProducts, childrenProducts } = useLoaderData<typeof loader>();
+  const { user, banners, featuredProducts, genderCategories, productCategories, categoryProducts } = useLoaderData<typeof loader>();
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isLoading, isNavigating, destinationPath } = useLoadingState();
@@ -218,9 +223,15 @@ export default function Index() {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-6">
               <Link to="/products" className="text-gray-700 hover:text-gray-900 transition-colors">Products</Link>
-              <Link to="/products?gender=men" className="text-gray-700 hover:text-gray-900 transition-colors">Men</Link>
-              <Link to="/products?gender=women" className="text-gray-700 hover:text-gray-900 transition-colors">Women</Link>
-              <Link to="/products?gender=children" className="text-gray-700 hover:text-gray-900 transition-colors">Children</Link>
+              {genderCategories.map((category) => (
+                <Link
+                  key={category.value}
+                  to={`/products?gender=${category.value}`}
+                  className="text-gray-700 hover:text-gray-900 transition-colors"
+                >
+                  {category.label}
+                </Link>
+              ))}
               <Link to="/about" className="text-gray-700 hover:text-gray-900 transition-colors">About</Link>
               {user ? (
                 <div className="flex items-center space-x-3">
@@ -289,27 +300,16 @@ export default function Index() {
                 >
                   All Products
                 </Link>
-                <Link
-                  to="/products?gender=men"
-                  className="text-gray-700 hover:text-gray-900 transition-colors py-2 px-4 rounded-md hover:bg-gray-50"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Men's Eyewear
-                </Link>
-                <Link
-                  to="/products?gender=women"
-                  className="text-gray-700 hover:text-gray-900 transition-colors py-2 px-4 rounded-md hover:bg-gray-50"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Women's Eyewear
-                </Link>
-                <Link
-                  to="/products?gender=children"
-                  className="text-gray-700 hover:text-gray-900 transition-colors py-2 px-4 rounded-md hover:bg-gray-50"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Children's Eyewear
-                </Link>
+                {genderCategories.map((category) => (
+                  <Link
+                    key={category.value}
+                    to={`/products?gender=${category.value}`}
+                    className="text-gray-700 hover:text-gray-900 transition-colors py-2 px-4 rounded-md hover:bg-gray-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {category.label} Eyewear
+                  </Link>
+                ))}
                 <Link
                   to="/about"
                   className="text-gray-700 hover:text-gray-900 transition-colors py-2 px-4 rounded-md hover:bg-gray-50"
@@ -448,92 +448,44 @@ export default function Index() {
             </p>
           </div>
 
-          {/* Men's Products */}
-          {menProducts.length > 0 && (
-            <div className="mb-12 sm:mb-16">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
-                <div className="mb-4 sm:mb-0">
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">Men's Eyewear</h3>
-                  <p className="text-sm sm:text-base text-gray-600">Sophisticated and durable designs for the modern man</p>
-                </div>
-                <Link to="/products?gender=men" className="hidden md:block">
-                  <Button variant="outline" size="lg" className="touch-manipulation">
-                    View All Men's <ChevronRightIcon className="w-5 h-5 ml-1" />
-                  </Button>
-                </Link>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-                {menProducts.map((product: any) => (
-                  <ProductCard key={product._id} product={product} />
-                ))}
-              </div>
-              <div className="text-center mt-6 sm:mt-8 md:hidden">
-                <Link to="/products?gender=men">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto touch-manipulation">
-                    View All Men's <ChevronRightIcon className="w-5 h-5 ml-1" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
+          {/* Dynamic Category Sections */}
+          {genderCategories.map((category) => {
+            const products = categoryProducts[category.value] || [];
+            if (products.length === 0) return null;
 
-          {/* Women's Products */}
-          {womenProducts.length > 0 && (
-            <div className="mb-12 sm:mb-16">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
-                <div className="mb-4 sm:mb-0">
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">Women's Eyewear</h3>
-                  <p className="text-sm sm:text-base text-gray-600">Elegant and fashionable frames for every style</p>
+            return (
+              <div key={category.value} className="mb-12 sm:mb-16 last:mb-0">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
+                  <div className="mb-4 sm:mb-0">
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">{category.label} Eyewear</h3>
+                    <p className="text-sm sm:text-base text-gray-600">
+                      {category.value === 'men' && 'Sophisticated and durable designs for the modern man'}
+                      {category.value === 'women' && 'Elegant and fashionable frames for every style'}
+                      {category.value === 'children' && 'Safe, comfortable, and fun glasses for kids'}
+                      {!['men', 'women', 'children'].includes(category.value) && `Premium ${category.label.toLowerCase()} eyewear collection`}
+                    </p>
+                  </div>
+                  <Link to={`/products?gender=${category.value}`} className="hidden md:block">
+                    <Button variant="outline" size="lg" className="touch-manipulation">
+                      View All {category.label} <ChevronRightIcon className="w-5 h-5 ml-1" />
+                    </Button>
+                  </Link>
                 </div>
-                <Link to="/products?gender=women" className="hidden md:block">
-                  <Button variant="outline" size="lg" className="touch-manipulation">
-                    View All Women's <ChevronRightIcon className="w-5 h-5 ml-1" />
-                  </Button>
-                </Link>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-                {womenProducts.map((product: any) => (
-                  <ProductCard key={product._id} product={product} />
-                ))}
-              </div>
-              <div className="text-center mt-6 sm:mt-8 md:hidden">
-                <Link to="/products?gender=women">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto touch-manipulation">
-                    View All Women's <ChevronRightIcon className="w-5 h-5 ml-1" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {/* Children's Products */}
-          {childrenProducts.length > 0 && (
-            <div>
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
-                <div className="mb-4 sm:mb-0">
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">Children's Eyewear</h3>
-                  <p className="text-sm sm:text-base text-gray-600">Safe, comfortable, and fun glasses for kids</p>
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+                  {products.map((product: any) => (
+                    <ProductCard key={product._id} product={product} />
+                  ))}
                 </div>
-                <Link to="/products?gender=children" className="hidden md:block">
-                  <Button variant="outline" size="lg" className="touch-manipulation">
-                    View All Kids' <ChevronRightIcon className="w-5 h-5 ml-1" />
-                  </Button>
-                </Link>
+                <div className="text-center mt-6 sm:mt-8 md:hidden">
+                  <Link to={`/products?gender=${category.value}`}>
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto touch-manipulation">
+                      View All {category.label} <ChevronRightIcon className="w-5 h-5 ml-1" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-                {childrenProducts.map((product: any) => (
-                  <ProductCard key={product._id} product={product} />
-                ))}
-              </div>
-              <div className="text-center mt-6 sm:mt-8 md:hidden">
-                <Link to="/products?gender=children">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto touch-manipulation">
-                    View All Kids' <ChevronRightIcon className="w-5 h-5 ml-1" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
+            );
+          })}
         </div>
       </section>
 
@@ -572,7 +524,7 @@ export default function Index() {
       )}
 
       {/* Footer */}
-      <Footer />
+      <Footer productCategories={productCategories} />
     </div>
   );
 }
