@@ -1,10 +1,9 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { getActiveCategories } from "~/utils/categories.server";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader() {
   const { genderCategories, productCategories } = await getActiveCategories();
 
   return json({

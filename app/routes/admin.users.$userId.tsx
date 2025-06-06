@@ -9,7 +9,6 @@ import { requireAdmin } from '~/utils/auth.server';
 import { getDb } from '~/utils/db.server';
 import { UserSchema, type User } from '~/models';
 import { Button } from '~/components/ui/button';
-import { Select } from '~/components/ui/select';
 import { FormSelect } from '~/components/ui/form-select';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';

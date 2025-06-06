@@ -9,16 +9,14 @@ import {
   SITE_CONFIG,
   SEO_KEYWORDS
 } from '~/utils/seo';
-import { Select } from '~/components/ui/select';
 import { CustomSelect } from '~/components/ui/custom-select';
-import { FilterIcon, SearchIcon, MenuIcon, XIcon } from 'lucide-react';
+import { FilterIcon, SearchIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import { SimpleWhatsAppButton } from '~/components/ui/whatsapp-contact';
 import { PromotionalBanner } from '~/components/ui/promotional-banner';
 import { Footer } from '~/components/ui/footer';
 import { useLoadingState } from '~/hooks/useLoadingState';
-import { LoadingProductGrid, LoadingFilters, LoadingSpinner } from '~/components/ui/loading';
-import { OptimizedImage } from '~/components/ui/optimized-image';
+import { LoadingProductGrid, LoadingFilters } from '~/components/ui/loading';
 import { getActiveCategories } from '~/utils/categories.server';
 import { StructuredData } from '~/components/structured-data';
 
@@ -87,7 +85,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
+export const meta: MetaFunction<typeof loader> = ({ location }) => {
   const searchParams = new URLSearchParams(location.search);
   const search = searchParams.get('search') || '';
   const gender = searchParams.get('gender') || '';
@@ -139,13 +137,6 @@ export default function ProductsIndex() {
     newParams.delete('page'); // Reset to first page when filtering
     setSearchParams(newParams);
     setMobileFiltersOpen(false); // Close mobile filters after selecting
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
   };
 
   // Generate structured data for this page

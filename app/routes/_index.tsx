@@ -11,7 +11,7 @@ import { OptimizedImage } from "~/components/ui/optimized-image";
 import { PromotionalBanner } from "~/components/ui/promotional-banner";
 import { Footer } from "~/components/ui/footer";
 import { useLoadingState } from "~/hooks/useLoadingState";
-import { LoadingBanner, LoadingProductGrid, LoadingSpinner } from "~/components/ui/loading";
+import { LoadingBanner, LoadingProductGrid } from "~/components/ui/loading";
 import { getActiveCategories } from "~/utils/categories.server";
 import {
   generateSEOMeta,
@@ -105,7 +105,7 @@ export default function Index() {
   const { user, banners, featuredProducts, genderCategories, productCategories, categoryProducts } = useLoaderData<typeof loader>();
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isLoading, isNavigating, destinationPath } = useLoadingState();
+  const { isLoading, isNavigating } = useLoadingState();
 
   // Auto-rotate banners
   useEffect(() => {

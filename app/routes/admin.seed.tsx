@@ -1,4 +1,4 @@
-import { json, redirect, type ActionFunctionArgs } from '@remix-run/node';
+import { json, type ActionFunctionArgs } from '@remix-run/node';
 import { Form, useNavigation } from '@remix-run/react';
 import { requireAdmin } from '~/utils/auth.server';
 import { seedDatabase } from '~/utils/seed.server';
