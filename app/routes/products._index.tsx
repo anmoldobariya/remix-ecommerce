@@ -19,6 +19,7 @@ import { Footer } from '~/components/ui/footer';
 import { useLoadingState } from '~/hooks/useLoadingState';
 import { LoadingProductGrid, LoadingFilters, LoadingSpinner } from '~/components/ui/loading';
 import { OptimizedImage } from '~/components/ui/optimized-image';
+import { getActiveCategories } from '~/utils/categories.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -51,7 +52,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     filter.productType = type;
   }
 
-  const [products, totalCount] = await Promise.all([
+  const [products, totalCount, categories] = await Promise.all([
     productsCollection
       .find(filter)
       .sort({ isFeatured: -1, createdAt: -1 })
@@ -59,6 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       .limit(limit)
       .toArray(),
     productsCollection.countDocuments(filter),
+    getActiveCategories(),
   ]);
 
   const totalPages = Math.ceil(totalCount / limit);
@@ -80,6 +82,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       gender,
       type,
     },
+    categories,
   });
 }
 
@@ -129,7 +132,7 @@ export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
 };
 
 export default function ProductsIndex() {
-  const { products, pagination, filters } = useLoaderData<typeof loader>();
+  const { products, pagination, filters, categories } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const { isLoading, isNavigating } = useLoadingState();
@@ -292,9 +295,7 @@ export default function ProductsIndex() {
                 <CustomSelect
                   options={[
                     { value: "", label: "All Genders" },
-                    { value: "men", label: "Men" },
-                    { value: "women", label: "Women" },
-                    { value: "children", label: "Children" }
+                    ...categories.genderCategories
                   ]}
                   value={filters.gender}
                   onChange={(value) => updateFilter('gender', value)}
@@ -310,10 +311,7 @@ export default function ProductsIndex() {
                 <CustomSelect
                   options={[
                     { value: "", label: "All Types" },
-                    { value: "sunglasses", label: "Sunglasses" },
-                    { value: "computer-glasses", label: "Computer Glasses" },
-                    { value: "reading-glasses", label: "Reading Glasses" },
-                    { value: "prescription-glasses", label: "Prescription Glasses" }
+                    ...categories.productCategories
                   ]}
                   value={filters.type}
                   onChange={(value) => updateFilter('type', value)}

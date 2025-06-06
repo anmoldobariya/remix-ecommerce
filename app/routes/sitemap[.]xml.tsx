@@ -1,5 +1,6 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { getDb } from "~/utils/db.server";
+import { getActiveCategories } from "~/utils/categories.server";
 import { SITE_CONFIG } from "~/utils/seo";
 import type { Product } from "~/models";
 
@@ -7,11 +8,14 @@ export const loader: LoaderFunction = async () => {
   const db = await getDb();
   const productsCollection = db.collection<Product>('products');
 
-  // Get all active products
-  const products = await productsCollection
-    .find({ isActive: true })
-    .project({ _id: 1, updatedAt: 1 })
-    .toArray();
+  // Get all active products and categories
+  const [products, { genderCategories, productCategories }] = await Promise.all([
+    productsCollection
+      .find({ isActive: true })
+      .project({ _id: 1, updatedAt: 1 })
+      .toArray(),
+    getActiveCategories()
+  ]);
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -49,48 +53,22 @@ export const loader: LoaderFunction = async () => {
   </url>`).join('')}
   
   <!-- Category pages -->
+  ${productCategories.map(category => `
   <url>
-    <loc>${SITE_CONFIG.url}/products?type=sunglasses</loc>
+    <loc>${SITE_CONFIG.url}/products?type=${category.value}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>${SITE_CONFIG.url}/products?type=prescription</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>${SITE_CONFIG.url}/products?type=computer</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  </url>`).join('')}
   
   <!-- Gender category pages -->
+  ${genderCategories.map(category => `
   <url>
-    <loc>${SITE_CONFIG.url}/products?gender=men</loc>
+    <loc>${SITE_CONFIG.url}/products?gender=${category.value}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>${SITE_CONFIG.url}/products?gender=women</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>${SITE_CONFIG.url}/products?gender=unisex</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  </url>`).join('')}
 </urlset>`;
 
   return new Response(sitemap, {
