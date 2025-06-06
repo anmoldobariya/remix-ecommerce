@@ -43,7 +43,7 @@ export async function getDb(): Promise<Db> {
 
 // For compatibility, export a proxy that forces initialization
 export const db = new Proxy({} as Db, {
-  get(target, prop) {
+  get(_, prop) {
     if (!dbInstance) {
       throw new Error(
         'Database not initialized. Use getDb() instead or ensure proper initialization.'

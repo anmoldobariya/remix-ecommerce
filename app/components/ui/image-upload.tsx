@@ -1,6 +1,6 @@
 import { useState, useRef, DragEvent } from 'react';
 import { Button } from '~/components/ui/button';
-import { XIcon, UploadIcon, ImageIcon } from 'lucide-react';
+import { XIcon, UploadIcon } from 'lucide-react';
 
 interface ImageUploadProps {
   images: string[];
@@ -108,9 +108,9 @@ export function ImageUpload({ images, onChange, maxImages = 10, disabled = false
       {/* Upload Area */}
       <div
         className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${isDragging
-            ? 'border-blue-400 bg-blue-50'
-            : 'border-gray-300 hover:border-gray-400'
-          } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          ? 'border-blue-400 bg-blue-50'
+          : 'border-gray-300 hover:border-gray-400'
+        } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
