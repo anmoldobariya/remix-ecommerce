@@ -5,6 +5,7 @@ import {
   type ActionFunctionArgs,
 } from '@remix-run/node';
 import { useLoaderData, useNavigation, Form } from '@remix-run/react';
+import { useState } from 'react';
 import { requireAdmin } from '~/utils/auth.server';
 import { getDb } from '~/utils/db.server';
 import { BannerSchema, type Banner } from '~/models';
@@ -12,6 +13,7 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Textarea } from '~/components/ui/textarea';
+import { ImageUpload } from '~/components/ui/image-upload';
 import { ObjectId } from 'mongodb';
 import { LoadingForm } from '~/components/ui/loading';
 import { useLoadingState } from '~/hooks/useLoadingState';
@@ -68,12 +70,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return redirect('/admin/banners');
   }
 
+  // Handle image field - ImageUpload component sends images as array, but banner only needs one
+  const images = formData.getAll('images').filter(img => img && img.toString().trim());
+  const imageUrl = images.length > 0 ? images[0].toString() : formData.get('image');
+
   const rawData = {
     title: formData.get('title'),
     subtitle: formData.get('subtitle') || undefined,
     description: formData.get('description') || undefined,
-    image: formData.get('image'),
-    link: formData.get('link') || undefined,
+    image: imageUrl,
+    link: formData.get('link')?.toString().trim() || undefined,
     buttonText: formData.get('buttonText') || undefined,
     isActive: formData.get('isActive') === 'on',
     order: parseInt(formData.get('order') as string) || 0,
@@ -110,8 +116,25 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     return redirect('/admin/banners');
   } catch (error) {
+    console.error('Banner validation error:', error);
+
+    // If it's a Zod validation error, return specific field errors
+    if (error instanceof Error && error.name === 'ZodError') {
+      return json(
+        {
+          error: 'Validation failed',
+          fieldErrors: (error as any).flatten().fieldErrors,
+          details: error.message
+        },
+        { status: 400 }
+      );
+    }
+
     return json(
-      { error: 'Invalid banner data. Please check your inputs.' },
+      {
+        error: 'Invalid banner data. Please check your inputs.',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 400 }
     );
   }
@@ -123,6 +146,11 @@ export default function BannerForm() {
   const { isLoading, isNavigating } = useLoadingState();
   const isSubmitting = navigation.state === 'submitting';
   const { confirm } = useConfirmation();
+
+  // Initialize images state - convert single banner image to array for ImageUpload component
+  const [images, setImages] = useState<string[]>(
+    banner?.image ? [banner.image] : []
+  );
 
   if (isLoading && !isNavigating) {
     return (
@@ -185,15 +213,23 @@ export default function BannerForm() {
             </div>
 
             <div className="md:col-span-2">
-              <Label htmlFor="image">Image URL *</Label>
-              <Input
-                id="image"
-                name="image"
-                type="url"
-                required
-                defaultValue={banner?.image || ''}
-                placeholder="https://example.com/banner-image.jpg"
+              <Label>Banner Image *</Label>
+              <p className="text-sm text-gray-500 mb-2">Upload a banner image</p>
+              <ImageUpload
+                images={images}
+                onChange={setImages}
+                maxImages={1}
+                disabled={isSubmitting}
               />
+              {/* Hidden inputs for form submission */}
+              {images.map((imageUrl, index) => (
+                <input
+                  key={index}
+                  type="hidden"
+                  name="images"
+                  value={imageUrl}
+                />
+              ))}
             </div>
 
             <div>
@@ -201,7 +237,7 @@ export default function BannerForm() {
               <Input
                 id="link"
                 name="link"
-                type="url"
+                type="text"
                 defaultValue={banner?.link || ''}
                 placeholder="https://example.com/destination"
               />
