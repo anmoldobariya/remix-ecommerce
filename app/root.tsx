@@ -37,30 +37,7 @@ export const meta: MetaFunction = () => {
     { name: "theme-color", content: "#2563eb" },
     { name: "apple-mobile-web-app-title", content: "Optical Shop" },
     { name: "application-name", content: "Optical Shop" },
-    { name: "msapplication-TileColor", content: "#2563eb" },
-    // Organization structured data will be added by individual pages
-    {
-      tagName: "script",
-      type: "application/ld+json",
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Optical Shop",
-        "url": "https://opticalshop.com",
-        "logo": "https://opticalshop.com/logo-light.png",
-        "description": "Premium eyewear collection with personalized service.",
-        "telephone": "+1-800-OPTICAL",
-        "email": "hello@opticalshop.com",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "123 Vision Street",
-          "addressLocality": "Eye City",
-          "addressRegion": "NY",
-          "postalCode": "10001",
-          "addressCountry": "United States"
-        }
-      })
-    }
+    { name: "msapplication-TileColor", content: "#2563eb" }
   ];
 };
 

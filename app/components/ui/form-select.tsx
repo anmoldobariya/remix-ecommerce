@@ -17,7 +17,7 @@ export interface FormSelectProps {
 }
 
 const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
-  ({ options, name, defaultValue = "", placeholder = "Select an option", className, disabled = false, ...props }, ref) => {
+  ({ options, name, defaultValue = "", placeholder = "Select an option", className, disabled = false, ...props }, _ref) => {
     const [isOpen, setIsOpen] = React.useState(false);
     const [selectedValue, setSelectedValue] = React.useState(defaultValue);
     const selectRef = React.useRef<HTMLDivElement>(null);

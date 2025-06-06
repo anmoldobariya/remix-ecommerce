@@ -11,7 +11,6 @@ import {
   PlusIcon,
   EyeIcon,
   TrendingUpIcon,
-  ShoppingBagIcon,
   StarIcon
 } from 'lucide-react';
 import { useLoadingState } from '~/hooks/useLoadingState';

@@ -8,15 +8,20 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Textarea } from '~/components/ui/textarea';
 import { ImageUpload } from '~/components/ui/image-upload';
-import { Select } from '~/components/ui/select';
 import { FormSelect } from '~/components/ui/form-select';
 import { ProductSchema, Product } from '~/models';
 import { ObjectId } from 'mongodb';
 import { useLoadingState } from '~/hooks/useLoadingState';
-import { LoadingForm, LoadingSpinner } from '~/components/ui/loading';
+import { LoadingForm } from '~/components/ui/loading';
+import { getActiveCategories } from '~/utils/categories.server';
+import { renameAndUpdateProductImages } from '~/utils/upload.server';
 
 type LoaderData = {
   product: (Product & { _id: string }) | null;
+  categories: {
+    genderCategories: Array<{ value: string; label: string }>;
+    productCategories: Array<{ value: string; label: string }>;
+  };
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs): Promise<Response> {
@@ -24,16 +29,21 @@ export async function loader({ request, params }: LoaderFunctionArgs): Promise<R
 
   const { productId } = params;
 
-  if (productId && productId !== 'new') {
-    const db = await getDb();
-    const product = await db.collection('products').findOne({ _id: new ObjectId(productId) });
-    if (!product) {
-      throw new Response('Product not found', { status: 404 });
-    }
-    return json({ product: { ...product, _id: product._id.toString() } });
-  }
+  const [productData, categories] = await Promise.all([
+    productId && productId !== 'new'
+      ? (async () => {
+        const db = await getDb();
+        const product = await db.collection('products').findOne({ _id: new ObjectId(productId) });
+        if (!product) {
+          throw new Response('Product not found', { status: 404 });
+        }
+        return { ...product, _id: product._id.toString() };
+      })()
+      : null,
+    getActiveCategories(),
+  ]);
 
-  return json({ product: null });
+  return json({ product: productData, categories });
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -45,6 +55,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
   // Parse array fields
   const images = formData.getAll('images').filter(img => img && img.toString().trim());
   const features = formData.getAll('features').filter(feature => feature && feature.toString().trim());
+
+  // Get temporary ID if provided
+  const tempId = formData.get('tempId') as string;
 
   const productData = {
     ...data,
@@ -78,18 +91,45 @@ export async function action({ request, params }: ActionFunctionArgs) {
   } else {
     // Create new product
     const { _id, ...productDataWithoutId } = result.data;
-    await db.collection('products').insertOne({
+    const insertResult = await db.collection('products').insertOne({
       ...productDataWithoutId,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+
+    const newProductId = insertResult.insertedId.toString();
+
+    // If there's a tempId, rename the temporary images to use the actual product ID
+    if (tempId && result.data.images && result.data.images.length > 0) {
+      try {
+        const updatedImages = await renameAndUpdateProductImages(
+          tempId,
+          newProductId,
+          result.data.images
+        );
+
+        // Update the product with the renamed image URLs
+        await db.collection('products').updateOne(
+          { _id: insertResult.insertedId },
+          {
+            $set: {
+              images: updatedImages,
+              updatedAt: new Date()
+            }
+          }
+        );
+      } catch (error) {
+        console.error('Failed to rename images:', error);
+        // Continue without renaming if it fails
+      }
+    }
   }
 
   return redirect('/admin/products');
 }
 
 export default function ProductForm() {
-  const { product } = useLoaderData<LoaderData>();
+  const { product, categories } = useLoaderData<LoaderData>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const { isLoading, isNavigating } = useLoadingState();
@@ -100,6 +140,7 @@ export default function ProductForm() {
   const [featureFields, setFeatureFields] = useState(
     product?.features?.length ? product.features : ['']
   );
+  const [tempId, setTempId] = useState<string>('');
 
   const isSubmitting = navigation.state === 'submitting';
   const isEditing = Boolean(product);
@@ -215,9 +256,7 @@ export default function ProductForm() {
                   defaultValue={product?.genderCategory}
                   options={[
                     { value: "", label: "Select Gender Category" },
-                    { value: "men", label: "Men" },
-                    { value: "women", label: "Women" },
-                    { value: "children", label: "Children" }
+                    ...categories.genderCategories
                   ]}
                   placeholder="Select Gender Category"
                 />
@@ -233,10 +272,7 @@ export default function ProductForm() {
                   defaultValue={product?.productType}
                   options={[
                     { value: "", label: "Select Product Type" },
-                    { value: "sunglasses", label: "Sunglasses" },
-                    { value: "computer-glasses", label: "Computer Glasses" },
-                    { value: "reading-glasses", label: "Reading Glasses" },
-                    { value: "prescription-glasses", label: "Prescription Glasses" }
+                    ...categories.productCategories
                   ]}
                   placeholder="Select Product Type"
                 />
@@ -256,6 +292,8 @@ export default function ProductForm() {
               onChange={setImages}
               maxImages={10}
               disabled={isSubmitting}
+              productId={isEditing ? product?._id : undefined}
+              onTempIdChange={setTempId}
             />
             {/* Hidden inputs for form submission */}
             {images.map((imageUrl, index) => (
@@ -266,6 +304,14 @@ export default function ProductForm() {
                 value={imageUrl}
               />
             ))}
+            {/* Hidden input for temporary ID */}
+            {tempId && (
+              <input
+                type="hidden"
+                name="tempId"
+                value={tempId}
+              />
+            )}
             {actionData?.errors?.images && (
               <p className="text-sm text-destructive mt-1">{actionData.errors.images[0]}</p>
             )}

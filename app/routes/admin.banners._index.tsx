@@ -1,5 +1,5 @@
 import { json, redirect, type LoaderFunctionArgs, type ActionFunctionArgs } from '@remix-run/node';
-import { Link, useLoaderData, useNavigation } from '@remix-run/react';
+import { Link, useLoaderData } from '@remix-run/react';
 import { requireAdmin } from '~/utils/auth.server';
 import { getDb } from '~/utils/db.server';
 import { Button } from '~/components/ui/button';
@@ -50,7 +50,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function BannersIndex() {
   const { banners } = useLoaderData<typeof loader>();
-  const navigation = useNavigation();
   const { isLoading, isNavigating } = useLoadingState();
   const { confirm } = useConfirmation();
 
