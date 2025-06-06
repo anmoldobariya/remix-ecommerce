@@ -1,5 +1,5 @@
 import { json, type LoaderFunctionArgs, type ActionFunctionArgs, type MetaFunction } from '@remix-run/node';
-import { useLoaderData, Link, Form, useSearchParams } from '@remix-run/react';
+import { useLoaderData, Link, Form, useSearchParams, redirect } from '@remix-run/react';
 import { getDb } from '~/utils/db.server';
 import { requireAdmin } from '~/utils/auth.server';
 import { Button } from '~/components/ui/button';
@@ -10,6 +10,8 @@ import { useLoadingState } from '~/hooks/useLoadingState';
 import { LoadingTable, LoadingFilters } from '~/components/ui/loading';
 import { generateSEOMeta, SITE_CONFIG } from '~/utils/seo';
 import { getActiveCategories } from '~/utils/categories.server';
+import { useConfirmation } from '~/components/ui/confirmation-dialog';
+import { TrashIcon } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return generateSEOMeta({
@@ -80,7 +82,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (action === 'delete' && productId) {
     await db.collection('products').deleteOne({ _id: new ObjectId(productId) });
-    return json({ success: true });
+    return redirect('/admin/products');
   }
 
   if (action === 'toggle-active' && productId) {
@@ -112,6 +114,7 @@ export default function AdminProducts() {
   const { products, pagination, filters, categories } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
   const { isLoading, isNavigating } = useLoadingState();
+  const { confirm } = useConfirmation();
 
   // Show loading state only for initial load, not navigation
   if (isLoading && !isNavigating) {
@@ -290,6 +293,32 @@ export default function AdminProducts() {
                           {product.isFeatured ? 'Unfeature' : 'Feature'}
                         </Button>
                       </Form>
+                      <form method="post" className="inline">
+                        <input type="hidden" name="bannerId" value={product._id} />
+                        <input type="hidden" name="_action" value="delete" />
+                        <Button
+                          type="submit"
+                          variant="outline"
+                          size="sm"
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            const confirmed = await confirm({
+                              title: 'Delete Product',
+                              message: `Are you sure you want to delete the product "${product.name}"? This action cannot be undone.`,
+                              confirmText: 'Delete Product',
+                              cancelText: 'Cancel',
+                              variant: 'danger'
+                            });
+
+                            if (confirmed) {
+                              const form = e.currentTarget.closest('form');
+                              if (form) form.submit();
+                            }
+                          }}
+                        >
+                          <TrashIcon className="w-4 h-4 text-red-600" />
+                        </Button>
+                      </form>
                     </td>
                   </tr>
                 ))
