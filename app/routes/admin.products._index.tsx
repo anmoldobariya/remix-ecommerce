@@ -11,6 +11,7 @@ import { ObjectId } from 'mongodb';
 import { useLoadingState } from '~/hooks/useLoadingState';
 import { LoadingTable, LoadingFilters, LoadingSpinner } from '~/components/ui/loading';
 import { generateSEOMeta, SITE_CONFIG } from '~/utils/seo';
+import { getActiveCategories } from '~/utils/categories.server';
 
 export const meta: MetaFunction = () => {
   return generateSEOMeta({
@@ -44,7 +45,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (category) filter.genderCategory = category;
   if (type) filter.productType = type;
 
-  const [products, totalCount] = await Promise.all([
+  const [products, totalCount, categories] = await Promise.all([
     db.collection('products')
       .find(filter)
       .sort({ createdAt: -1 })
@@ -52,6 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       .limit(limit)
       .toArray(),
     db.collection('products').countDocuments(filter),
+    getActiveCategories(),
   ]);
 
   const totalPages = Math.ceil(totalCount / limit);
@@ -66,6 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       hasPrevPage: page > 1,
     },
     filters: { search, category, type },
+    categories,
   });
 }
 
@@ -108,7 +111,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function AdminProducts() {
-  const { products, pagination, filters } = useLoaderData<typeof loader>();
+  const { products, pagination, filters, categories } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
   const { isLoading, isNavigating } = useLoadingState();
 
@@ -163,9 +166,7 @@ export default function AdminProducts() {
             defaultValue={filters.category}
             options={[
               { value: "", label: "All Categories" },
-              { value: "men", label: "Men" },
-              { value: "women", label: "Women" },
-              { value: "children", label: "Children" }
+              ...categories.genderCategories
             ]}
             placeholder="Select category"
           />
@@ -174,10 +175,7 @@ export default function AdminProducts() {
             defaultValue={filters.type}
             options={[
               { value: "", label: "All Types" },
-              { value: "sunglasses", label: "Sunglasses" },
-              { value: "computer-glasses", label: "Computer Glasses" },
-              { value: "reading-glasses", label: "Reading Glasses" },
-              { value: "prescription-glasses", label: "Prescription Glasses" }
+              ...categories.productCategories
             ]}
             placeholder="Select type"
           />
