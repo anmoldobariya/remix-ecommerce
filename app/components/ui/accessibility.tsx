@@ -171,15 +171,10 @@ interface AccessibleImageProps {
 
 export function AccessibleImage({ src, alt, loading = 'lazy', className, onError }: AccessibleImageProps) {
   const [imageError, setImageError] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleError = () => {
     setImageError(true);
     onError?.();
-  };
-
-  const handleLoad = () => {
-    setImageLoaded(true);
   };
 
   if (imageError) {
@@ -201,7 +196,6 @@ export function AccessibleImage({ src, alt, loading = 'lazy', className, onError
       loading={loading}
       className={className}
       onError={handleError}
-      onLoad={handleLoad}
       aria-hidden={!alt}
     />
   );

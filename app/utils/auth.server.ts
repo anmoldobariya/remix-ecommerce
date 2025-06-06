@@ -1,5 +1,4 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { createCookieSessionStorage, redirect } from '@remix-run/node';
 import { getDb } from './db.server';
 import { ObjectId } from 'mongodb';

@@ -10,7 +10,7 @@ import { WhatsAppContact, PhoneContact } from '~/components/ui/whatsapp-contact'
 import { PromotionalBanner } from '~/components/ui/promotional-banner';
 import { Footer } from '~/components/ui/footer';
 import { useLoadingState } from '~/hooks/useLoadingState';
-import { LoadingProductDetail, LoadingCard } from '~/components/ui/loading';
+import { LoadingProductDetail } from '~/components/ui/loading';
 import { OptimizedImage } from '~/components/ui/optimized-image';
 import {
   generateSEOMeta,
@@ -79,13 +79,6 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const productTitle = `${product.name} | ${SITE_CONFIG.name}`;
   const productDescription = generateProductDescription(product);
   const productKeywords = generateProductKeywords(product);
-
-  // Generate breadcrumb data
-  const breadcrumbs = [
-    { name: "Home", url: "/" },
-    { name: "Products", url: "/products" },
-    { name: product.name, url: `/products/${product._id}` }
-  ];
 
   // Generate product image URL for Open Graph
   const productImage = product.images?.[0]

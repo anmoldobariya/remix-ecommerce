@@ -4,12 +4,10 @@ import { getDb } from '~/utils/db.server';
 import { requireAdmin } from '~/utils/auth.server';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
-import { Select } from '~/components/ui/select';
-import { CustomSelect } from '~/components/ui/custom-select';
 import { FormSelect } from '~/components/ui/form-select';
 import { ObjectId } from 'mongodb';
 import { useLoadingState } from '~/hooks/useLoadingState';
-import { LoadingTable, LoadingFilters, LoadingSpinner } from '~/components/ui/loading';
+import { LoadingTable, LoadingFilters } from '~/components/ui/loading';
 import { generateSEOMeta, SITE_CONFIG } from '~/utils/seo';
 import { getActiveCategories } from '~/utils/categories.server';
 

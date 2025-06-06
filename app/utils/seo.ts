@@ -83,8 +83,7 @@ export function generateSEOMeta(
     canonical,
     image = `${SITE_CONFIG.url}${SITE_CONFIG.logo}`,
     type = 'website',
-    noIndex = false,
-    structuredData
+    noIndex = false
   } = options;
 
   const fullTitle = title.includes(SITE_CONFIG.name)

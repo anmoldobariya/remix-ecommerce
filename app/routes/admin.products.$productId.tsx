@@ -8,12 +8,11 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Textarea } from '~/components/ui/textarea';
 import { ImageUpload } from '~/components/ui/image-upload';
-import { Select } from '~/components/ui/select';
 import { FormSelect } from '~/components/ui/form-select';
 import { ProductSchema, Product } from '~/models';
 import { ObjectId } from 'mongodb';
 import { useLoadingState } from '~/hooks/useLoadingState';
-import { LoadingForm, LoadingSpinner } from '~/components/ui/loading';
+import { LoadingForm } from '~/components/ui/loading';
 import { getActiveCategories } from '~/utils/categories.server';
 
 type LoaderData = {
