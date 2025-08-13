@@ -73,7 +73,7 @@ export default function BannersIndex() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Banner Management</h1>
-          <p className="text-gray-600">Manage promotional banners for your optical shop</p>
+          <p className="text-gray-600">Manage promotional banners for your eyewear business</p>
         </div>
         <Link to="/admin/banners/new">
           <Button>

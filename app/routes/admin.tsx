@@ -2,6 +2,7 @@ import { json, type LoaderFunctionArgs } from '@remix-run/node';
 import { Link, Outlet, useLoaderData, useLocation } from '@remix-run/react';
 import { requireAdmin } from '~/utils/auth.server';
 import { Button } from '~/components/ui/button';
+import { SITE_CONFIG } from '~/utils/seo';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireAdmin(request);
@@ -36,7 +37,7 @@ export default function AdminLayout() {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="text-xl font-bold text-gray-900">
-                Optical Shop Admin
+                {SITE_CONFIG.name} Admin
               </Link>
             </div>
             <div className="flex items-center space-x-4">

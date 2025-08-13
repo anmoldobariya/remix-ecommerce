@@ -62,12 +62,7 @@ export default function About() {
     }
   ];
 
-  const stats = [
-    { number: "10,000+", label: "Happy Customers" },
-    { number: "50+", label: "Premium Brands" },
-    { number: "28", label: "Years of Excellence" },
-    { number: "98%", label: "Customer Satisfaction" }
-  ];
+  const stats = SITE_CONFIG.about.stats;
 
   return (
     <>
@@ -78,7 +73,7 @@ export default function About() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <Link to="/" className="text-xl sm:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
-                Optical Shop
+                {SITE_CONFIG.name}
               </Link>
               <div className="flex items-center space-x-4">
                 <Link to="/products">
@@ -106,7 +101,7 @@ export default function About() {
               Your Vision, Our Personal Service
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Since 1995, we've specialized in providing premium eyewear with personalized consultations
+              We specialize in providing premium eyewear with personalized consultations
               and competitive pricing. Every customer receives individual attention and customized quotes.
             </p>
           </div>
@@ -129,19 +124,13 @@ export default function About() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Our Story</h2>
                 <div className="prose max-w-none text-gray-600">
                   <p className="mb-4">
-                    Founded in 1995 by Dr. Sarah Johnson, Optical Shop began as a small family business
-                    with a simple mission: to provide high-quality eyewear and exceptional customer service
-                    to our local community.
+                    {SITE_CONFIG.about.story.mission.replace('{BUSINESS_NAME}', SITE_CONFIG.name)}
                   </p>
                   <p className="mb-4">
-                    What started as a single storefront has grown into the region's most trusted optical
-                    destination, serving over 10,000 satisfied customers. We've maintained our commitment
-                    to personalized care while embracing the latest technology and fashion trends.
+                    {SITE_CONFIG.about.story.commitment}
                   </p>
                   <p>
-                    Today, our team of certified opticians and style consultants continues to uphold
-                    the values that built our reputation: expertise, integrity, and genuine care for
-                    every customer who walks through our doors.
+                    {SITE_CONFIG.about.story.values}
                   </p>
                 </div>
               </div>
@@ -224,7 +213,7 @@ export default function About() {
                       Browse Our Collection
                     </Button>
                   </Link>
-                  <a href="tel:+1-800-OPTICAL" className="block">
+                  <a href={`tel:${SITE_CONFIG.phone}`} className="block">
                     <Button variant="outline" className="w-full text-white border-white hover:bg-white hover:text-blue-600">
                       📞 Call for Instant Quote
                     </Button>

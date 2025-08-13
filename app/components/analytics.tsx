@@ -1,6 +1,7 @@
 // Google Analytics and Search Console integration
 import { useLocation } from "@remix-run/react";
 import { useEffect } from "react";
+import { SITE_CONFIG } from "~/utils/seo";
 
 declare global {
   interface Window {
@@ -10,11 +11,9 @@ declare global {
 }
 
 // Configuration
-const GA_MEASUREMENT_ID = process.env.NODE_ENV === 'production'
-  ? 'G-XXXXXXXXXX' // Replace with your actual Google Analytics ID
-  : 'G-XXXXXXXXXX'; // Development GA ID (optional)
+const GA_MEASUREMENT_ID = process.env.GOOGLE_ANALYTICS_ID;
 
-const GOOGLE_SEARCH_CONSOLE_VERIFICATION = 'your-search-console-verification-code';
+const GOOGLE_SEARCH_CONSOLE_VERIFICATION = process.env.GOOGLE_SEARCH_CONSOLE_VERIFICATION;
 
 // Google Analytics component
 export function GoogleAnalytics() {
@@ -79,7 +78,7 @@ export const trackProductView = (product: any) => {
       item_name: product.name,
       category: product.category || 'eyewear',
       price: product.price,
-      brand: product.brand || 'Optical Shop'
+      brand: product.brand || SITE_CONFIG.name
     }]
   });
 };
@@ -92,7 +91,7 @@ export const trackProductListView = (products: any[], listName: string) => {
       item_name: product.name,
       category: product.category || 'eyewear',
       price: product.price,
-      brand: product.brand || 'Optical Shop'
+      brand: product.brand || SITE_CONFIG.name
     }))
   });
 };
