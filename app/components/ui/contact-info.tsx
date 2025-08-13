@@ -1,4 +1,5 @@
 import { MapPinIcon, ClockIcon, MailIcon, PhoneIcon } from 'lucide-react';
+import { SITE_CONFIG } from '~/utils/seo';
 
 export function ContactInfo() {
   return (
@@ -12,9 +13,7 @@ export function ContactInfo() {
           <div>
             <p className="font-medium text-gray-900">Visit Our Showroom</p>
             <p className="text-gray-600 text-sm">
-              123 Vision Street<br />
-              Optical Plaza, Suite 456<br />
-              Eyewear City, EC 12345
+              {SITE_CONFIG.address.full}
             </p>
           </div>
         </div>
@@ -25,8 +24,8 @@ export function ContactInfo() {
           <div>
             <p className="font-medium text-gray-900">Call for Instant Quote</p>
             <p className="text-gray-600 text-sm">
-              <a href="tel:+1-800-OPTICAL" className="hover:text-blue-600 transition-colors">
-                +1 (800) OPTICAL
+              <a href={`tel:${SITE_CONFIG.phone}`} className="hover:text-blue-600 transition-colors">
+                {SITE_CONFIG.phone}
               </a>
             </p>
             <p className="text-gray-500 text-xs">Free consultation & personalized pricing</p>
@@ -39,8 +38,8 @@ export function ContactInfo() {
           <div>
             <p className="font-medium text-gray-900">Email Inquiries</p>
             <p className="text-gray-600 text-sm">
-              <a href="mailto:hello@opticalshop.com" className="hover:text-blue-600 transition-colors">
-                hello@opticalshop.com
+              <a href={`mailto:${SITE_CONFIG.email}`} className="hover:text-blue-600 transition-colors">
+                {SITE_CONFIG.email}
               </a>
             </p>
             <p className="text-gray-500 text-xs">Detailed quotes within 2 hours</p>
