@@ -103,19 +103,104 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Index() {
   const { user, banners, featuredProducts, genderCategories, productCategories, categoryProducts } = useLoaderData<typeof loader>();
-  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isLoading, isNavigating } = useLoadingState();
 
-  // Auto-rotate banners
-  useEffect(() => {
-    if (banners.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [banners.length]);
+  // Banner component that manages its own state to prevent affecting other components
+  const BannerSection = ({ banners }: { banners: any[] }) => {
+    const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+
+    useEffect(() => {
+      if (banners.length > 1) {
+        const interval = setInterval(() => {
+          setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+        }, 5000);
+        return () => clearInterval(interval);
+      }
+    }, [banners.length]);
+
+    if (banners.length === 0) return null;
+
+    return (
+      <section className="relative overflow-hidden">
+        <div className="relative h-64 sm:h-80 md:h-96 lg:h-[600px]">
+          {banners.map((banner: any, index: number) => (
+            <div
+              key={banner._id}
+              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentBannerIndex
+                ? 'opacity-100 scale-100'
+                : 'opacity-0 scale-105'
+                }`}
+            >
+              <img
+                src={banner.image}
+                alt={banner.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 flex items-center justify-center">
+                <div className="text-center text-white max-w-4xl px-4 sm:px-6">
+                  <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold mb-3 sm:mb-4 md:mb-6 animate-fade-in leading-tight">
+                    {banner.title}
+                  </h2>
+                  {banner.subtitle && (
+                    <p className="text-sm sm:text-lg md:text-xl lg:text-3xl mb-4 sm:mb-6 md:mb-8 animate-fade-in-delay">
+                      {banner.subtitle}
+                    </p>
+                  )}
+                  {banner.description && (
+                    <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 md:mb-10 opacity-90 max-w-2xl mx-auto animate-fade-in-delay-2 leading-relaxed">
+                      {banner.description}
+                    </p>
+                  )}
+                  {banner.link && banner.buttonText && (
+                    <Link to={banner.link}>
+                      <Button size="lg" className="text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-white text-gray-900 hover:bg-gray-100 animate-fade-in-delay-3 touch-manipulation">
+                        {banner.buttonText}
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {banners.length > 1 && (
+          <>
+            {/* Navigation Dots */}
+            <div className="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-3">
+              {banners.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentBannerIndex(index)}
+                  className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-all duration-300 touch-manipulation ${index === currentBannerIndex
+                    ? 'bg-white scale-110'
+                    : 'bg-white/50 hover:bg-white/75'
+                    }`}
+                />
+              ))}
+            </div>
+
+            {/* Navigation Arrows */}
+            <button
+              onClick={() => setCurrentBannerIndex((prev) => prev === 0 ? banners.length - 1 : prev - 1)}
+              className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 sm:p-3 rounded-full transition-all duration-300 touch-manipulation"
+            >
+              <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6 rotate-180" />
+            </button>
+            <button
+              onClick={() => setCurrentBannerIndex((prev) => (prev + 1) % banners.length)}
+              className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 sm:p-3 rounded-full transition-all duration-300 touch-manipulation"
+            >
+              <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          </>
+        )}
+      </section>
+    );
+  };
+
+
 
   // Show loading state only for initial load, not navigation
   if (isLoading && !isNavigating) {
@@ -158,27 +243,32 @@ export default function Index() {
   }
 
   const ProductCard = ({ product }: { product: any }) => (
-    <Link
-      to={`/products/${product._id}`}
-      className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200 touch-manipulation active:scale-95"
-    >
-      <div className="aspect-square overflow-hidden bg-gray-50">
+    <div className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200 touch-manipulation active:scale-95">
+      <Link
+        to={`/products/${product._id}`}
+        className="block aspect-square overflow-hidden bg-gray-50"
+      >
         <OptimizedImage
           src={product.images?.[0]}
           alt={product.name}
           className="w-full h-full group-hover:scale-105 transition-transform duration-500"
           priority={false}
         />
-      </div>
+      </Link>
       <div className="p-3 sm:p-4 lg:p-5">
-        <div className="flex items-start justify-between mb-1 sm:mb-2">
-          <span className="text-xs text-blue-600 uppercase tracking-wide font-semibold">
-            {product.brand}
-          </span>
-        </div>
-        <h3 className="font-semibold text-gray-900 mb-2 sm:mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors text-sm sm:text-base truncate">
-          {product.name}
-        </h3>
+        <Link
+          to={`/products/${product._id}`}
+          className="block"
+        >
+          <div className="flex items-start justify-between mb-1 sm:mb-2">
+            <span className="text-xs text-blue-600 uppercase tracking-wide font-semibold">
+              {product.brand}
+            </span>
+          </div>
+          <h3 className="font-semibold text-gray-900 mb-2 sm:mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors text-sm sm:text-base truncate">
+            {product.name}
+          </h3>
+        </Link>
         <div className="pt-2 border-t border-gray-100">
           <SimpleWhatsAppButton
             productName={product.name}
@@ -192,7 +282,7 @@ export default function Index() {
           </p>
         )}
       </div>
-    </Link>
+    </div>
   );
 
   // Generate structured data for this page
@@ -219,7 +309,7 @@ export default function Index() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <Link to="/" className="flex items-center">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">Optical Shop</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">{SITE_CONFIG.name}</h1>
               </Link>
 
               {/* Desktop Navigation */}
@@ -331,83 +421,7 @@ export default function Index() {
         </header>
 
         {/* Hero Banners */}
-        {banners.length > 0 && (
-          <section className="relative overflow-hidden">
-            <div className="relative h-64 sm:h-80 md:h-96 lg:h-[600px]">
-              {banners.map((banner: any, index: number) => (
-                <div
-                  key={banner._id}
-                  className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentBannerIndex
-                    ? 'opacity-100 scale-100'
-                    : 'opacity-0 scale-105'
-                    }`}
-                >
-                  <img
-                    src={banner.image}
-                    alt={banner.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 flex items-center justify-center">
-                    <div className="text-center text-white max-w-4xl px-4 sm:px-6">
-                      <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold mb-3 sm:mb-4 md:mb-6 animate-fade-in leading-tight">
-                        {banner.title}
-                      </h2>
-                      {banner.subtitle && (
-                        <p className="text-sm sm:text-lg md:text-xl lg:text-3xl mb-4 sm:mb-6 md:mb-8 animate-fade-in-delay">
-                          {banner.subtitle}
-                        </p>
-                      )}
-                      {banner.description && (
-                        <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 md:mb-10 opacity-90 max-w-2xl mx-auto animate-fade-in-delay-2 leading-relaxed">
-                          {banner.description}
-                        </p>
-                      )}
-                      {banner.link && banner.buttonText && (
-                        <Link to={banner.link}>
-                          <Button size="lg" className="text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-white text-gray-900 hover:bg-gray-100 animate-fade-in-delay-3 touch-manipulation">
-                            {banner.buttonText}
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {banners.length > 1 && (
-              <>
-                {/* Navigation Dots */}
-                <div className="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-3">
-                  {banners.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentBannerIndex(index)}
-                      className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-all duration-300 touch-manipulation ${index === currentBannerIndex
-                        ? 'bg-white scale-110'
-                        : 'bg-white/50 hover:bg-white/75'
-                        }`}
-                    />
-                  ))}
-                </div>
-
-                {/* Navigation Arrows */}
-                <button
-                  onClick={() => setCurrentBannerIndex((prev) => prev === 0 ? banners.length - 1 : prev - 1)}
-                  className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 sm:p-3 rounded-full transition-all duration-300 touch-manipulation"
-                >
-                  <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6 rotate-180" />
-                </button>
-                <button
-                  onClick={() => setCurrentBannerIndex((prev) => (prev + 1) % banners.length)}
-                  className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 sm:p-3 rounded-full transition-all duration-300 touch-manipulation"
-                >
-                  <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
-              </>
-            )}
-          </section>
-        )}
+        <BannerSection banners={banners} />
 
         {/* Featured Products */}
         {featuredProducts.length > 0 && (
@@ -495,7 +509,7 @@ export default function Index() {
         {banners.length === 0 && featuredProducts.length === 0 && (
           <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Welcome to Optical Shop</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Welcome to {SITE_CONFIG.name}</h2>
               <p className="text-base sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto">
                 Discover premium eyewear for every lifestyle. From stylish sunglasses to computer glasses,
                 we have the perfect pair for you.

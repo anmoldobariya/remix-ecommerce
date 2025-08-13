@@ -9,6 +9,7 @@ import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import { NavigationLoadingOverlay } from "~/components/ui/navigation-loading";
 import { GoogleAnalytics } from "~/components/analytics";
 import { ConfirmationDialogProvider } from "~/components/ui/confirmation-dialog";
+import { SITE_CONFIG } from "~/utils/seo";
 
 import "./tailwind.css";
 
@@ -31,12 +32,12 @@ export const links: LinksFunction = () => [
 // Global SEO meta tags for all pages
 export const meta: MetaFunction = () => {
   return [
-    { title: "Optical Shop - Premium Eyewear with Personal Service" },
-    { name: "description", content: "Premium eyewear collection with personalized service. Sunglasses, prescription glasses, computer glasses and more. Get instant quotes and expert consultations." },
+    { title: `${SITE_CONFIG.name} - ${SITE_CONFIG.tagline}` },
+    { name: "description", content: SITE_CONFIG.description },
     { name: "viewport", content: "width=device-width, initial-scale=1" },
     { name: "theme-color", content: "#2563eb" },
-    { name: "apple-mobile-web-app-title", content: "Optical Shop" },
-    { name: "application-name", content: "Optical Shop" },
+    { name: "apple-mobile-web-app-title", content: SITE_CONFIG.name },
+    { name: "application-name", content: SITE_CONFIG.name },
     { name: "msapplication-TileColor", content: "#2563eb" }
   ];
 };
@@ -51,7 +52,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
         <GoogleAnalytics />
       </head>
-      <body>
+      <body suppressHydrationWarning={true}>
         {children}
         <ScrollRestoration />
         <Scripts />

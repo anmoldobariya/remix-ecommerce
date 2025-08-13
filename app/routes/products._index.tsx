@@ -204,7 +204,7 @@ export default function ProductsIndex() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <Link to="/" className="text-xl sm:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
-                Optical Shop
+                {SITE_CONFIG.name}
               </Link>
               <div className="flex items-center space-x-2 sm:space-x-4">
                 <Link to="/login">
@@ -353,12 +353,14 @@ export default function ProductsIndex() {
                   {/* Products Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
                     {products.map((product: any) => (
-                      <Link
+                      <div
                         key={product._id}
-                        to={`/products/${product._id}`}
                         className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden touch-manipulation active:scale-95"
                       >
-                        <div className="aspect-square overflow-hidden">
+                        <Link
+                          to={`/products/${product._id}`}
+                          className="block aspect-square overflow-hidden"
+                        >
                           <img
                             src={product.images[0]}
                             alt={product.name}
@@ -367,21 +369,26 @@ export default function ProductsIndex() {
                               e.currentTarget.src = 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&h=400&fit=crop&crop=center';
                             }}
                           />
-                        </div>
+                        </Link>
                         <div className="p-3 sm:p-4">
-                          <div className="flex items-center justify-between mb-1 sm:mb-2">
-                            <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                              {product.brand}
-                            </span>
-                            {product.isFeatured && (
-                              <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                Featured
+                          <Link
+                            to={`/products/${product._id}`}
+                            className="block"
+                          >
+                            <div className="flex items-center justify-between mb-1 sm:mb-2">
+                              <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                                {product.brand}
                               </span>
-                            )}
-                          </div>
-                          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm sm:text-base">
-                            {product.name}
-                          </h3>
+                              {product.isFeatured && (
+                                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                  Featured
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm sm:text-base">
+                              {product.name}
+                            </h3>
+                          </Link>
                           <div className="py-3 border-t border-gray-100">
                             <SimpleWhatsAppButton
                               productName={product.name}
@@ -398,7 +405,7 @@ export default function ProductsIndex() {
                             </span>
                           </div>
                         </div>
-                      </Link>
+                      </div>
                     ))}
                   </div>
 

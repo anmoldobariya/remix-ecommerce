@@ -1,5 +1,6 @@
 import { MessageCircleIcon, PhoneIcon } from 'lucide-react';
 import { Button } from '~/components/ui/button';
+import { SITE_CONFIG } from '~/utils/seo';
 
 interface WhatsAppContactProps {
   productName: string;
@@ -14,8 +15,8 @@ export function WhatsAppContact({
   size = 'lg',
   className = ''
 }: WhatsAppContactProps) {
-  // WhatsApp business number (replace with actual number)
-  const whatsappNumber = '+1-800-OPTICAL'; // Update this with your actual WhatsApp business number
+  // WhatsApp business number
+  const whatsappNumber = SITE_CONFIG.whatsapp;
 
   const generateMessage = () => {
     const message = `🌟 Hello! I'm interested in the *${productName}*${productSku ? ` (Model: ${productSku})` : ''}
@@ -74,7 +75,7 @@ interface PhoneContactProps {
 }
 
 export function PhoneContact({ size = 'lg', className = '' }: PhoneContactProps) {
-  const phoneNumber = '+1-800-OPTICAL'; // Update with actual phone number
+  const phoneNumber = SITE_CONFIG.phone;
 
   return (
     <Button
@@ -103,7 +104,7 @@ export function SimpleWhatsAppButton({
   productSku,
   className = ''
 }: SimpleWhatsAppButtonProps) {
-  const whatsappNumber = '+1-800-OPTICAL'; // Update this with your actual WhatsApp business number
+  const whatsappNumber = SITE_CONFIG.whatsapp;
 
   const generateMessage = () => {
     const message = `👋 Hi! Quick question about the *${productName}*${productSku ? ` (${productSku})` : ''} 
