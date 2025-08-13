@@ -5,7 +5,7 @@ import type { Product } from '~/models';
 import { Button } from '~/components/ui/button';
 import { ArrowLeftIcon, CheckIcon } from 'lucide-react';
 import { ObjectId } from 'mongodb';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { WhatsAppContact, PhoneContact } from '~/components/ui/whatsapp-contact';
 import { PromotionalBanner } from '~/components/ui/promotional-banner';
 import { Footer } from '~/components/ui/footer';
@@ -100,6 +100,15 @@ export default function ProductDetail() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { isLoading, isNavigating } = useLoadingState();
 
+  // Reset selected image when product changes and ensure index is valid
+  useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [product._id]);
+
+  // Ensure selectedImageIndex is always valid
+  const images = product.images || [];
+  const safeImageIndex = selectedImageIndex >= 0 && selectedImageIndex < images.length ? selectedImageIndex : 0;
+
   const formatCategoryName = (name: string) => {
     return name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
@@ -137,7 +146,7 @@ export default function ProductDetail() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <Link to="/" className="text-xl sm:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
-                Optical Shop
+                {SITE_CONFIG.name}
               </Link>
               <div className="flex items-center space-x-2 sm:space-x-4">
                 <Link to="/products">
@@ -166,24 +175,26 @@ export default function ProductDetail() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 mb-12 sm:mb-16">
             {/* Product Images */}
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-3 sm:space-y-4" key={`product-images-${product._id}`}>
               <div className="aspect-square overflow-hidden rounded-lg bg-white shadow-sm">
                 <OptimizedImage
-                  src={product.images[selectedImageIndex]}
+                  key={`main-image-${safeImageIndex}`}
+                  src={images[safeImageIndex]}
                   alt={product.name}
                   className="w-full h-full object-cover"
                   priority={true}
                 />
               </div>
 
-              {product.images.length > 1 && (
+              {images.length > 1 && (
                 <div className="grid grid-cols-4 gap-2 sm:gap-4">
-                  {product.images.map((image: string, index: number) => (
+                  {images.map((image: string, index: number) => (
                     <button
                       key={index}
+                      type="button"
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`aspect-square overflow-hidden rounded-lg border-2 touch-manipulation ${selectedImageIndex === index
-                        ? 'border-blue-500'
+                      className={`aspect-square overflow-hidden rounded-lg border-2 touch-manipulation transition-all duration-200 ${safeImageIndex === index
+                        ? 'border-blue-500 ring-2 ring-blue-200'
                         : 'border-gray-200 hover:border-gray-300'
                         }`}
                     >

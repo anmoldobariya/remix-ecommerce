@@ -99,7 +99,7 @@ export default function AdminDashboard() {
           <TrendingUpIcon className="w-8 h-8 mr-3 text-blue-600" />
           Admin Dashboard
         </h1>
-        <p className="text-gray-600 mt-2">Manage your optical shop content and product showcase</p>
+        <p className="text-gray-600 mt-2">Manage your eyewear business content and product showcase</p>
       </div>
 
       {isLoading ? (

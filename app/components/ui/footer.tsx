@@ -1,6 +1,7 @@
 import { Link } from '@remix-run/react';
 import { MessageCircleIcon, PhoneIcon, MailIcon, MapPinIcon } from 'lucide-react';
 import { Button } from './button';
+import { SITE_CONFIG } from '~/utils/seo';
 
 interface CategoryOption {
   value: string;
@@ -27,14 +28,14 @@ export function Footer({ productCategories }: FooterProps = {}) {
           {/* Company Info */}
           <div className="space-y-4">
             <Link to="/" className="text-2xl font-bold hover:text-blue-400 transition-colors">
-              Optical Shop
+              {SITE_CONFIG.name}
             </Link>
             <p className="text-gray-300 text-sm leading-relaxed">
-              Premium eyewear with personalized service. Get custom quotes and expert recommendations for all your vision needs.
+              {SITE_CONFIG.description}
             </p>
             <div className="flex space-x-3">
               <a
-                href="https://wa.me/+1-800-OPTICAL"
+                href={`https://wa.me/${SITE_CONFIG.whatsapp.replace(/\D/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-600 hover:bg-green-700 p-2 rounded-full transition-colors"
@@ -43,14 +44,14 @@ export function Footer({ productCategories }: FooterProps = {}) {
                 <MessageCircleIcon className="w-5 h-5" />
               </a>
               <a
-                href="tel:+1-800-OPTICAL"
+                href={`tel:${SITE_CONFIG.phone}`}
                 className="bg-blue-600 hover:bg-blue-700 p-2 rounded-full transition-colors"
                 aria-label="Phone"
               >
                 <PhoneIcon className="w-5 h-5" />
               </a>
               <a
-                href="mailto:hello@opticalshop.com"
+                href={`mailto:${SITE_CONFIG.email}`}
                 className="bg-gray-700 hover:bg-gray-600 p-2 rounded-full transition-colors"
                 aria-label="Email"
               >
@@ -106,33 +107,31 @@ export function Footer({ productCategories }: FooterProps = {}) {
               <div className="flex items-start space-x-2">
                 <MapPinIcon className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
                 <div className="text-sm text-gray-300">
-                  123 Vision Street<br />
-                  Optical Plaza, Suite 456<br />
-                  Eyewear City, EC 12345
+                  {SITE_CONFIG.address.full}
                 </div>
               </div>
               <div className="flex items-center space-x-2">
                 <PhoneIcon className="w-4 h-4 text-gray-400" />
-                <a href="tel:+1-800-OPTICAL" className="text-sm text-gray-300 hover:text-white transition-colors">
-                  +1 (800) OPTICAL
+                <a href={`tel:${SITE_CONFIG.phone}`} className="text-sm text-gray-300 hover:text-white transition-colors">
+                  {SITE_CONFIG.phone}
                 </a>
               </div>
               <div className="flex items-center space-x-2">
                 <MailIcon className="w-4 h-4 text-gray-400" />
-                <a href="mailto:hello@opticalshop.com" className="text-sm text-gray-300 hover:text-white transition-colors">
-                  hello@opticalshop.com
+                <a href={`mailto:${SITE_CONFIG.email}`} className="text-sm text-gray-300 hover:text-white transition-colors">
+                  {SITE_CONFIG.email}
                 </a>
               </div>
             </div>
 
             <div className="mt-4 space-y-2">
-              <a href="https://wa.me/+1-800-OPTICAL" target="_blank" rel="noopener noreferrer">
+              <a href={`https://wa.me/${SITE_CONFIG.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer">
                 <Button size="sm" className="w-full bg-green-600 hover:bg-green-700 text-white">
                   <MessageCircleIcon className="w-4 h-4 mr-2" />
                   Get Quote on WhatsApp
                 </Button>
               </a>
-              <a href="tel:+1-800-OPTICAL">
+              <a href={`tel:${SITE_CONFIG.phone}`}>
                 <Button variant="outline" size="sm" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
                   <PhoneIcon className="w-4 h-4 mr-2" />
                   Call for Quote
@@ -145,7 +144,7 @@ export function Footer({ productCategories }: FooterProps = {}) {
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
             <p className="text-sm text-gray-400">
-              © 2025 Optical Shop. All rights reserved.
+              © {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.
             </p>
             <p className="text-sm text-gray-400">
               🎯 Personalized service • 💰 Custom pricing • 🚀 Expert advice
