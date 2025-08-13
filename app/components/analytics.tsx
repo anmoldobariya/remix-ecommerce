@@ -11,9 +11,7 @@ declare global {
 }
 
 // Configuration
-const GA_MEASUREMENT_ID = process.env.NODE_ENV === 'production'
-  ? 'G-XXXXXXXXXX' // Replace with your actual Google Analytics ID
-  : 'G-XXXXXXXXXX'; // Development GA ID (optional)
+const GA_MEASUREMENT_ID = process.env.GOOGLE_ANALYTICS_ID;
 
 const GOOGLE_SEARCH_CONSOLE_VERIFICATION = process.env.GOOGLE_SEARCH_CONSOLE_VERIFICATION;
 
