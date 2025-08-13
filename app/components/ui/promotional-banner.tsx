@@ -1,5 +1,6 @@
 import { MessageCircleIcon, PhoneIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
+import { SITE_CONFIG } from '~/utils/seo';
 
 interface PromotionalBannerProps {
   className?: string;
@@ -27,7 +28,7 @@ export function PromotionalBanner({ className = '' }: PromotionalBannerProps) {
 
         <div className="flex items-center space-x-2 ml-4">
           <a
-            href="https://wa.me/+1-800-OPTICAL"
+            href={`https://wa.me/${SITE_CONFIG.whatsapp.replace(/\D/g, '')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-1 bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors text-sm"
@@ -36,7 +37,7 @@ export function PromotionalBanner({ className = '' }: PromotionalBannerProps) {
             <span className="hidden sm:inline">WhatsApp</span>
           </a>
           <a
-            href="tel:+1-800-OPTICAL"
+            href={`tel:${SITE_CONFIG.phone}`}
             className="flex items-center space-x-1 bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors text-sm"
           >
             <PhoneIcon className="w-4 h-4" />

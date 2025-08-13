@@ -1,31 +1,52 @@
 // SEO utilities for generating meta tags, structured data, and SEO-optimized content
 import type { MetaDescriptor } from '@remix-run/node';
 
-// Brand and business information
+// Brand and business information - CUSTOMIZE THIS SECTION FOR YOUR TEMPLATE
 export const SITE_CONFIG = {
-  name: 'Optical Shop',
-  domain: 'opticalshop.com', // Replace with your actual domain
-  url: 'https://opticalshop.com', // Replace with your actual URL
+  name: 'Optical Shop', // Change this to your business name
+  domain: 'opticalshop.com', // Change this to your domain
+  url: 'https://opticalshop.com', // Change this to your full URL
   description:
-    'Premium eyewear collection with personalized service. Sunglasses, prescription glasses, computer glasses and more. Get instant quotes and expert consultations.',
-  tagline: 'Premium Eyewear with Personal Service',
-  phone: '+1-800-OPTICAL',
-  email: 'hello@opticalshop.com',
-  whatsapp: '+1-800-OPTICAL',
+    'Premium eyewear collection with personalized service. Get instant quotes and expert consultations for all your vision needs.', // Change this to your business description
+  tagline: 'Premium Eyewear with Personal Service', // Change this to your tagline
+  phone: '+1-800-54050', // Change this to your phone number
+  email: 'hello@opticalshop.com', // Change this to your email
+  whatsapp: '+1180054050', // Change this to your WhatsApp number
   address: {
     street: '123 Vision Street',
-    city: 'Eye City',
+    city: 'Optical Plaza',
     state: 'NY',
-    zip: '10001',
-    country: 'United States'
+    zip: '12345',
+    country: 'United States',
+    full: '123 Vision Street, Optical Plaza, NY 12345' // Full address string
   },
   social: {
-    facebook: 'https://facebook.com/opticalshop',
-    instagram: 'https://instagram.com/opticalshop',
-    twitter: 'https://twitter.com/opticalshop'
+    facebook: 'https://facebook.com/opticalshop', // Change to your Facebook URL
+    instagram: 'https://instagram.com/opticalshop', // Change to your Instagram URL
+    twitter: 'https://twitter.com/opticalshop' // Change to your Twitter URL
   },
   logo: '/logo-light.png',
-  favicon: '/favicon.ico'
+  favicon: '/favicon.ico',
+  // About page customization - Update these stats and content for your business
+  about: {
+    stats: [
+      { number: '1000+', label: 'Happy Customers' }, // Customize these numbers to match your business
+      { number: '50+', label: 'Premium Brands' }, // Examples for new businesses:
+      { number: '100%', label: 'Quality Guarantee' }, // "Same-Day", "Expert Staff", "Custom Quotes"
+      { number: '24/7', label: 'Quote Service' } // "100% Satisfaction", "Latest Tech", "Personal Care"
+      // Examples for established businesses: "X Years Experience", "X,000+ Customers", "98% Satisfaction"
+    ],
+    story: {
+      // Customize this story content for your business background and values
+      // The {BUSINESS_NAME} placeholder will be replaced with your actual business name
+      mission:
+        'At {BUSINESS_NAME}, we started with a simple mission: to provide high-quality eyewear and exceptional customer service to our community. We believe that finding the perfect pair of glasses should be a personalized experience, not a one-size-fits-all approach.',
+      commitment:
+        'Our commitment goes beyond just selling eyewear. We focus on building lasting relationships with our customers by offering personalized consultations, competitive pricing, and expert guidance to help you find eyewear that perfectly matches your lifestyle and budget.',
+      values:
+        'Today, our team of experienced opticians and style consultants continues to uphold the values that define our service: expertise, integrity, and genuine care for every customer who chooses us for their vision needs.'
+    }
+  }
 };
 
 // SEO Keywords by category
@@ -335,7 +356,7 @@ export function generateFAQStructuredData() {
         name: 'How do I get a personalized quote for eyewear?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Simply contact us via WhatsApp at +1-800-OPTICAL or call us directly. Our experts will provide instant personalized quotes based on your specific needs and preferences.'
+          text: `Simply contact us via WhatsApp at ${SITE_CONFIG.whatsapp} or call us directly. Our experts will provide instant personalized quotes based on your specific needs and preferences.`
         }
       },
       {
