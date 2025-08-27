@@ -10,25 +10,31 @@ declare global {
   }
 }
 
-// Configuration
-const GA_MEASUREMENT_ID = process.env.GOOGLE_ANALYTICS_ID;
-
-const GOOGLE_SEARCH_CONSOLE_VERIFICATION = process.env.GOOGLE_SEARCH_CONSOLE_VERIFICATION;
+interface GoogleAnalyticsProps {
+  env: {
+    NODE_ENV: string;
+    GOOGLE_ANALYTICS_ID?: string;
+    GOOGLE_SEARCH_CONSOLE_VERIFICATION?: string;
+  };
+}
 
 // Google Analytics component
-export function GoogleAnalytics() {
+export function GoogleAnalytics({ env }: GoogleAnalyticsProps) {
   const location = useLocation();
+  const GA_MEASUREMENT_ID = env.GOOGLE_ANALYTICS_ID;
+  const GOOGLE_SEARCH_CONSOLE_VERIFICATION =
+    env.GOOGLE_SEARCH_CONSOLE_VERIFICATION;
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.gtag && GA_MEASUREMENT_ID) {
-      window.gtag('config', GA_MEASUREMENT_ID, {
-        page_path: location.pathname + location.search,
+    if (typeof window !== "undefined" && window.gtag && GA_MEASUREMENT_ID) {
+      window.gtag("config", GA_MEASUREMENT_ID, {
+        page_path: location.pathname + location.search
       });
     }
-  }, [location]);
+  }, [location, GA_MEASUREMENT_ID]);
 
   // Only render in production
-  if (process.env.NODE_ENV !== 'production' || !GA_MEASUREMENT_ID) {
+  if (env.NODE_ENV !== "production" || !GA_MEASUREMENT_ID) {
     return null;
   }
 
@@ -48,7 +54,7 @@ export function GoogleAnalytics() {
             gtag('config', '${GA_MEASUREMENT_ID}', {
               page_path: window.location.pathname,
             });
-          `,
+          `
         }}
       />
 
@@ -62,34 +68,39 @@ export function GoogleAnalytics() {
 }
 
 // Enhanced tracking functions
-export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, parameters);
+export const trackEvent = (
+  eventName: string,
+  parameters?: Record<string, any>
+) => {
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag("event", eventName, parameters);
   }
 };
 
 // E-commerce tracking for product interactions
 export const trackProductView = (product: any) => {
-  trackEvent('view_item', {
-    currency: 'USD',
+  trackEvent("view_item", {
+    currency: "USD",
     value: product.price,
-    items: [{
-      item_id: product._id,
-      item_name: product.name,
-      category: product.category || 'eyewear',
-      price: product.price,
-      brand: product.brand || SITE_CONFIG.name
-    }]
+    items: [
+      {
+        item_id: product._id,
+        item_name: product.name,
+        category: product.category || "eyewear",
+        price: product.price,
+        brand: product.brand || SITE_CONFIG.name
+      }
+    ]
   });
 };
 
 export const trackProductListView = (products: any[], listName: string) => {
-  trackEvent('view_item_list', {
+  trackEvent("view_item_list", {
     item_list_name: listName,
-    items: products.map(product => ({
+    items: products.map((product) => ({
       item_id: product._id,
       item_name: product.name,
-      category: product.category || 'eyewear',
+      category: product.category || "eyewear",
       price: product.price,
       brand: product.brand || SITE_CONFIG.name
     }))
@@ -97,23 +108,23 @@ export const trackProductListView = (products: any[], listName: string) => {
 };
 
 export const trackWhatsAppContact = (productId?: string) => {
-  trackEvent('contact_whatsapp', {
-    method: 'whatsapp',
+  trackEvent("contact_whatsapp", {
+    method: "whatsapp",
     product_id: productId,
-    contact_type: 'inquiry'
+    contact_type: "inquiry"
   });
 };
 
 export const trackPhoneContact = (productId?: string) => {
-  trackEvent('contact_phone', {
-    method: 'phone',
+  trackEvent("contact_phone", {
+    method: "phone",
     product_id: productId,
-    contact_type: 'inquiry'
+    contact_type: "inquiry"
   });
 };
 
 export const trackSearch = (searchTerm: string, resultCount: number) => {
-  trackEvent('search', {
+  trackEvent("search", {
     search_term: searchTerm,
     result_count: resultCount
   });

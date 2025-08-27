@@ -4,8 +4,10 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData
 } from "@remix-run/react";
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { NavigationLoadingOverlay } from "~/components/ui/navigation-loading";
 import { GoogleAnalytics } from "~/components/analytics";
 import { ConfirmationDialogProvider } from "~/components/ui/confirmation-dialog";
@@ -13,20 +15,32 @@ import { SITE_CONFIG } from "~/utils/seo";
 
 import "./tailwind.css";
 
+// Loader to provide environment variables to the client
+export const loader = async () => {
+  return json({
+    ENV: {
+      NODE_ENV: process.env.NODE_ENV || "development",
+      GOOGLE_ANALYTICS_ID: process.env.GOOGLE_ANALYTICS_ID,
+      GOOGLE_SEARCH_CONSOLE_VERIFICATION:
+        process.env.GOOGLE_SEARCH_CONSOLE_VERIFICATION
+    }
+  });
+};
+
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
     href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
+    crossOrigin: "anonymous"
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
   },
   { rel: "icon", href: "/favicon.ico" },
   { rel: "apple-touch-icon", href: "/logo-light.png" },
-  { rel: "manifest", href: "/manifest.json" },
+  { rel: "manifest", href: "/manifest.json" }
 ];
 
 // Global SEO meta tags for all pages
@@ -43,6 +57,8 @@ export const meta: MetaFunction = () => {
 };
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const { ENV } = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -50,7 +66,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
-        <GoogleAnalytics />
+        <GoogleAnalytics env={ENV} />
       </head>
       <body suppressHydrationWarning={true}>
         {children}
