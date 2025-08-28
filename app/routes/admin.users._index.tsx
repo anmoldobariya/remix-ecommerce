@@ -1,39 +1,49 @@
-import { json, redirect, type LoaderFunctionArgs, type ActionFunctionArgs } from '@remix-run/node';
-import { Link, useLoaderData } from '@remix-run/react';
-import { requireAdmin } from '~/utils/auth.server';
-import { getDb } from '~/utils/db.server';
-import { Button } from '~/components/ui/button';
-import { PlusIcon, EditIcon, TrashIcon, UserIcon } from 'lucide-react';
-import type { User } from '~/models';
-import { ObjectId } from 'mongodb';
-import { LoadingTable } from '~/components/ui/loading';
-import { useLoadingState } from '~/hooks/useLoadingState';
-import { useConfirmation } from '~/components/ui/confirmation-dialog';
+import {
+  json,
+  redirect,
+  type LoaderFunctionArgs,
+  type ActionFunctionArgs
+} from "@remix-run/node";
+import { Link, useLoaderData } from "@remix-run/react";
+import { requireAdmin } from "~/utils/auth.server";
+import { getDb } from "~/utils/db.server";
+import { Button } from "~/components/ui/button";
+import { PlusIcon, EditIcon, TrashIcon, UserIcon } from "lucide-react";
+import type { User } from "~/models";
+import { ObjectId } from "mongodb";
+import { LoadingTable } from "~/components/ui/loading";
+import { useLoadingState } from "~/hooks/useLoadingState";
+import { useConfirmation } from "~/components/ui/confirmation-dialog";
 
 export async function action({ request }: ActionFunctionArgs) {
-  await requireAdmin(request);
+  const currentUser = await requireAdmin(request);
 
   const formData = await request.formData();
-  const userId = formData.get('userId') as string;
-  const action = formData.get('_action') as string;
+  const userId = formData.get("userId") as string;
+  const action = formData.get("_action") as string;
 
-  if (action === 'delete' && userId) {
+  if (action === "delete" && userId) {
+    // Prevent self-deletion
+    if (userId === currentUser._id?.toString()) {
+      throw new Response("You cannot delete your own account", { status: 400 });
+    }
+
     const db = await getDb();
-    const usersCollection = db.collection<User>('users');
+    const usersCollection = db.collection<User>("users");
 
     await usersCollection.deleteOne({
-      _id: new ObjectId(userId),
+      _id: new ObjectId(userId)
     });
   }
 
-  return redirect('/admin/users');
+  return redirect("/admin/users");
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await requireAdmin(request);
+  const currentUser = await requireAdmin(request);
 
   const db = await getDb();
-  const usersCollection = db.collection<User>('users');
+  const usersCollection = db.collection<User>("users");
 
   const users = await usersCollection
     .find({})
@@ -44,13 +54,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     users: users.map((user: User) => ({
       ...user,
       _id: user._id?.toString(),
-      password: undefined, // Don't send passwords to client
+      password: undefined // Don't send passwords to client
     })),
+    currentUser: {
+      ...currentUser,
+      _id: currentUser._id?.toString()
+    }
   });
 }
 
 export default function UsersIndex() {
-  const { users } = useLoaderData<typeof loader>();
+  const { users, currentUser } = useLoaderData<typeof loader>();
   const { isLoading, isNavigating } = useLoadingState();
   const { confirm } = useConfirmation();
 
@@ -136,10 +150,11 @@ export default function UsersIndex() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === 'admin'
-                          ? 'bg-purple-100 text-purple-800'
-                          : 'bg-gray-100 text-gray-800'
-                          }`}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          user.role === "admin"
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
                       >
                         {user.role}
                       </span>
@@ -154,32 +169,51 @@ export default function UsersIndex() {
                             <EditIcon className="w-4 h-4" />
                           </Button>
                         </Link>
-                        <form method="post" className="inline">
-                          <input type="hidden" name="userId" value={user._id} />
-                          <input type="hidden" name="_action" value="delete" />
+                        {user._id !== currentUser._id ? (
+                          <form method="post" className="inline">
+                            <input
+                              type="hidden"
+                              name="userId"
+                              value={user._id}
+                            />
+                            <input
+                              type="hidden"
+                              name="_action"
+                              value="delete"
+                            />
+                            <Button
+                              type="submit"
+                              variant="outline"
+                              size="sm"
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                const confirmed = await confirm({
+                                  title: "Delete User",
+                                  message: `Are you sure you want to delete the user "${user.name}"? This action cannot be undone.`,
+                                  confirmText: "Delete User",
+                                  cancelText: "Cancel",
+                                  variant: "danger"
+                                });
+
+                                if (confirmed) {
+                                  const form = e.currentTarget.closest("form");
+                                  if (form) form.submit();
+                                }
+                              }}
+                            >
+                              <TrashIcon className="w-4 h-4 text-red-600" />
+                            </Button>
+                          </form>
+                        ) : (
                           <Button
-                            type="submit"
                             variant="outline"
                             size="sm"
-                            onClick={async (e) => {
-                              e.preventDefault();
-                              const confirmed = await confirm({
-                                title: 'Delete User',
-                                message: `Are you sure you want to delete the user "${user.name}"? This action cannot be undone.`,
-                                confirmText: 'Delete User',
-                                cancelText: 'Cancel',
-                                variant: 'danger'
-                              });
-
-                              if (confirmed) {
-                                const form = e.currentTarget.closest('form');
-                                if (form) form.submit();
-                              }
-                            }}
+                            disabled
+                            title="You cannot delete your own account"
                           >
-                            <TrashIcon className="w-4 h-4 text-red-600" />
+                            <TrashIcon className="w-4 h-4 text-gray-400" />
                           </Button>
-                        </form>
+                        )}
                       </div>
                     </td>
                   </tr>

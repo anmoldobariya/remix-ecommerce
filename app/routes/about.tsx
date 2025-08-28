@@ -214,7 +214,7 @@ export default function About() {
                     </Button>
                   </Link>
                   <a href={`tel:${SITE_CONFIG.phone}`} className="block">
-                    <Button variant="outline" className="w-full text-white border-white hover:bg-white hover:text-blue-600">
+                    <Button variant="outline" className="w-full text-black border-white hover:bg-white hover:text-blue-600">
                       📞 Call for Instant Quote
                     </Button>
                   </a>

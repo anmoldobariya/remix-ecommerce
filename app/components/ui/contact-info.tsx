@@ -52,9 +52,8 @@ export function ContactInfo() {
           <div>
             <p className="font-medium text-gray-900">Consultation Hours</p>
             <div className="text-gray-600 text-sm space-y-1">
-              <p>Monday - Friday: 9:00 AM - 7:00 PM</p>
-              <p>Saturday: 9:00 AM - 6:00 PM</p>
-              <p>Sunday: 11:00 AM - 5:00 PM</p>
+              <p>Monday - Saturday: 9:30 AM - 9:00 PM</p>
+              <p>Sunday: 9:30 AM - 7:00 PM</p>
             </div>
           </div>
         </div>
