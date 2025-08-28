@@ -132,7 +132,7 @@ export function Footer({ productCategories }: FooterProps = {}) {
                 </Button>
               </a>
               <a href={`tel:${SITE_CONFIG.phone}`}>
-                <Button variant="outline" size="sm" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
+                <Button variant="outline" size="sm" className="w-full border-gray-600 text-gray-700 hover:bg-gray-500">
                   <PhoneIcon className="w-4 h-4 mr-2" />
                   Call for Quote
                 </Button>

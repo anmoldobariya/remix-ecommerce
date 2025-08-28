@@ -3,27 +3,27 @@ import type { MetaDescriptor } from '@remix-run/node';
 
 // Brand and business information - CUSTOMIZE THIS SECTION FOR YOUR TEMPLATE
 export const SITE_CONFIG = {
-  name: 'Optical Shop', // Change this to your business name
+  name: 'Divine Optical', // Change this to your business name
   domain: 'opticalshop.com', // Change this to your domain
   url: 'https://opticalshop.com', // Change this to your full URL
   description:
     'Premium eyewear collection with personalized service. Get instant quotes and expert consultations for all your vision needs.', // Change this to your business description
   tagline: 'Premium Eyewear with Personal Service', // Change this to your tagline
-  phone: '+1-800-54050', // Change this to your phone number
-  email: 'hello@opticalshop.com', // Change this to your email
-  whatsapp: '+1180054050', // Change this to your WhatsApp number
+  phone: '+91919054972726', // Change this to your phone number
+  email: 'divineoptical23@gmail.com', // Change this to your email
+  whatsapp: '+919054972726', // Change this to your WhatsApp number
   address: {
     street: '123 Vision Street',
     city: 'Optical Plaza',
     state: 'NY',
     zip: '12345',
     country: 'United States',
-    full: '123 Vision Street, Optical Plaza, NY 12345' // Full address string
+    full: 'G-34, Happy Hallmark Shoppers, near Celebrity Greens, Vesu, Surat, Gujarat-395007' // Full address string
   },
   social: {
     facebook: 'https://facebook.com/opticalshop', // Change to your Facebook URL
-    instagram: 'https://instagram.com/opticalshop', // Change to your Instagram URL
-    twitter: 'https://twitter.com/opticalshop' // Change to your Twitter URL
+    instagram: 'https://www.instagram.com/divine_optical/', // Change to your Instagram URL
+    // twitter: 'https://twitter.com/opticalshop' // Change to your Twitter URL
   },
   logo: '/logo-light.png',
   favicon: '/favicon.ico',
@@ -31,9 +31,9 @@ export const SITE_CONFIG = {
   about: {
     stats: [
       { number: '1000+', label: 'Happy Customers' }, // Customize these numbers to match your business
-      { number: '50+', label: 'Premium Brands' }, // Examples for new businesses:
+      { number: '25+', label: 'Premium Brands' }, // Examples for new businesses:
       { number: '100%', label: 'Quality Guarantee' }, // "Same-Day", "Expert Staff", "Custom Quotes"
-      { number: '24/7', label: 'Quote Service' } // "100% Satisfaction", "Latest Tech", "Personal Care"
+      { number: '100%', label: 'Customer Satisfaction' } // "100% Satisfaction", "Latest Tech", "Personal Care"
       // Examples for established businesses: "X Years Experience", "X,000+ Customers", "98% Satisfaction"
     ],
     story: {
@@ -182,7 +182,7 @@ export function generateOrganizationStructuredData() {
     sameAs: [
       SITE_CONFIG.social.facebook,
       SITE_CONFIG.social.instagram,
-      SITE_CONFIG.social.twitter
+      // SITE_CONFIG.social.twitter
     ]
   };
 }
@@ -215,21 +215,21 @@ export function generateLocalBusinessStructuredData() {
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-        opens: '09:00',
-        closes: '18:00'
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        opens: '09:30',
+        closes: '21:00'
       },
       {
         '@type': 'OpeningHoursSpecification',
-        dayOfWeek: 'Saturday',
-        opens: '10:00',
-        closes: '16:00'
+        dayOfWeek: 'Sunday',
+        opens: '09:30',
+        closes: '19:00'
       }
     ],
     sameAs: [
       SITE_CONFIG.social.facebook,
       SITE_CONFIG.social.instagram,
-      SITE_CONFIG.social.twitter
+      // SITE_CONFIG.social.twitter
     ]
   };
 }
