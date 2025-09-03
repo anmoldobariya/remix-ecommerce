@@ -4,8 +4,8 @@ import type { MetaDescriptor } from '@remix-run/node';
 // Brand and business information - CUSTOMIZE THIS SECTION FOR YOUR TEMPLATE
 export const SITE_CONFIG = {
   name: 'Divine Optical', // Change this to your business name
-  domain: 'divine-optical.vercel.app/', // Change this to your domain
-  url: 'https://divine-optical.vercel.app/', // Change this to your full URL
+  domain: 'divine-optical.vercel.app', // Change this to your domain
+  url: 'https://divine-optical.vercel.app', // Change this to your full URL
   description:
     'Premium eyewear collection with personalized service. Get instant quotes and expert consultations for all your vision needs.', // Change this to your business description
   tagline: 'Premium Eyewear with Personal Service', // Change this to your tagline
