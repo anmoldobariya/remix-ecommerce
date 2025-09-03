@@ -67,7 +67,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         <GoogleAnalytics env={ENV} />
-        <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYEL143FG0"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
