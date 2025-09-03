@@ -9,7 +9,7 @@ export const SITE_CONFIG = {
   description:
     'Premium eyewear collection with personalized service. Get instant quotes and expert consultations for all your vision needs.', // Change this to your business description
   tagline: 'Premium Eyewear with Personal Service', // Change this to your tagline
-  phone: '+91919054972726', // Change this to your phone number
+  phone: '+919054972726', // Change this to your phone number
   email: 'divineoptical23@gmail.com', // Change this to your email
   whatsapp: '+919054972726', // Change this to your WhatsApp number
   address: {
