@@ -19,7 +19,8 @@ import {
   generateBreadcrumbStructuredData,
   generateFAQStructuredData,
   SITE_CONFIG,
-  SEO_KEYWORDS
+  SEO_KEYWORDS,
+  generateWebSiteStructuredData
 } from "~/utils/seo";
 import { StructuredData } from "~/components/structured-data";
 
@@ -291,10 +292,11 @@ export default function Index() {
     { name: "Home", url: "/" }
   ]);
   const faqData = generateFAQStructuredData();
+  const websiteData = generateWebSiteStructuredData();
 
   const combinedStructuredData = {
     "@context": "https://schema.org",
-    "@graph": [localBusinessData, breadcrumbData, faqData]
+    "@graph": [localBusinessData, breadcrumbData, faqData, websiteData]
   };
 
   return (

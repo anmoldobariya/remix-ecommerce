@@ -21,4 +21,4 @@ async function runSeed() {
   }
 }
 
-runSeed().catch(console.error);
+// runSeed().catch(console.error);

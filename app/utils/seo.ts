@@ -4,24 +4,28 @@ import type { MetaDescriptor } from '@remix-run/node';
 // Brand and business information - CUSTOMIZE THIS SECTION FOR YOUR TEMPLATE
 export const SITE_CONFIG = {
   name: 'Divine Optical', // Change this to your business name
-  domain: 'opticalshop.com', // Change this to your domain
-  url: 'https://opticalshop.com', // Change this to your full URL
+  domain: 'divine-optical.vercel.app', // Change this to your domain
+  url: 'https://divine-optical.vercel.app', // Change this to your full URL
   description:
     'Premium eyewear collection with personalized service. Get instant quotes and expert consultations for all your vision needs.', // Change this to your business description
   tagline: 'Premium Eyewear with Personal Service', // Change this to your tagline
-  phone: '+91919054972726', // Change this to your phone number
+  phone: '+919054972726', // Change this to your phone number
   email: 'divineoptical23@gmail.com', // Change this to your email
   whatsapp: '+919054972726', // Change this to your WhatsApp number
   address: {
-    street: '123 Vision Street',
-    city: 'Optical Plaza',
-    state: 'NY',
-    zip: '12345',
-    country: 'United States',
+    street: 'G-34, Happy Hallmark Shoppers',
+    city: 'Surat',
+    state: 'GJ',
+    zip: '395007',
+    country: 'India',
     full: 'G-34, Happy Hallmark Shoppers, near Celebrity Greens, Vesu, Surat, Gujarat-395007' // Full address string
   },
+  geo: {
+    latitude: '21.130080686350308',
+    longitude: '72.7741492557581'
+  },
   social: {
-    facebook: 'https://facebook.com/opticalshop', // Change to your Facebook URL
+    facebook: 'https://www.facebook.com/profile.php?id=61555054359756', // Change to your Facebook URL
     instagram: 'https://www.instagram.com/divine_optical/', // Change to your Instagram URL
     // twitter: 'https://twitter.com/opticalshop' // Change to your Twitter URL
   },
@@ -209,8 +213,7 @@ export function generateLocalBusinessStructuredData() {
     },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: '40.7128', // Replace with actual coordinates
-      longitude: '-74.0060'
+      ...SITE_CONFIG.geo
     },
     openingHoursSpecification: [
       {
@@ -258,11 +261,11 @@ export function generateProductStructuredData(product: any) {
         name: SITE_CONFIG.name
       }
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      reviewCount: '127'
-    }
+    // aggregateRating: {
+    //   '@type': 'AggregateRating',
+    //   ratingValue: '4.8',
+    //   reviewCount: '127'
+    // }
   };
 }
 
@@ -285,8 +288,20 @@ export function generateWebSiteStructuredData() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${SITE_CONFIG.url}/#website`,
     name: SITE_CONFIG.name,
+    alternateName: SITE_CONFIG.tagline,
     url: SITE_CONFIG.url,
+    description: SITE_CONFIG.description,
+    publisher: {
+      '@type': 'Organization',
+      '@id': `${SITE_CONFIG.url}/#organization`,
+      name: SITE_CONFIG.name,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SITE_CONFIG.url}${SITE_CONFIG.logo}`
+      }
+    },
     potentialAction: {
       '@type': 'SearchAction',
       target: {
